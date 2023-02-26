@@ -6,7 +6,8 @@
 
 const int WIDTH = 640;
 const int HEIGHT = 480;
-const int BALL_SIZE = 10;
+//const int BALL_SIZE = 10;
+const int BALL_SIZE = 15;
 
 typedef struct Ball {
     float x;
@@ -24,7 +25,7 @@ typedef struct Player {
 const int PLAYER_WIDTH = 20;
 const int PLAYER_HEIGHT = 75;
 const int PLAYER_MARGIN = 10;
-const float PLAYER_MOVE_SPEED = 250.0f; //150.0f;
+const float PLAYER_MOVE_SPEED = 450.0f; //150.0f;
 
 bool served = false;
 Ball ball;
@@ -46,6 +47,8 @@ void UpdatePlayers(float elapsed);
 void RenderPlayers(void);
 
 void UpdateScore(int player, int points);
+
+void drawcircle(int x0, int y0, int radius);
 
 int main(int argc, char * argv[]){
     atexit(Shutdown); // weird look this up for more info
@@ -143,14 +146,18 @@ Ball MakeBall(int size) {
 void RenderBall(const Ball* ball){
     int size = ball->size;
     int halfSize = size / 2;
-    SDL_Rect rect = {
-        .x = ball->x - halfSize,
-        .y = ball->y - halfSize,
-        .w = size,
-        .h = size
-    };
+    // SDL_Rect rect = {
+    //     .x = ball->x - halfSize,
+    //     .y = ball->y - halfSize,
+    //     .w = size,
+    //     .h = size
+    // };
+    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 30);
+    // SDL_RenderFillRect(renderer, &rect);
+
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    drawcircle(ball->x, ball->y, halfSize);
+
 }
 
 void UpdateBall(Ball *ball, float elapsed){
@@ -297,4 +304,39 @@ void UpdateScore(int player, int points){
     char buf[len+1];
     snprintf(buf, len + 1, fmt, player1.score, player2.score);
     SDL_SetWindowTitle(window, buf);
+}
+
+void drawcircle(int x0, int y0, int radius)
+{
+    int x = radius-1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+
+    while (x >= y)
+    {
+        SDL_RenderDrawPoint(renderer,x0 + x, y0 + y);
+        SDL_RenderDrawPoint(renderer,x0 + y, y0 + x);
+        SDL_RenderDrawPoint(renderer,x0 - y, y0 + x);
+        SDL_RenderDrawPoint(renderer,x0 - x, y0 + y);
+        SDL_RenderDrawPoint(renderer,x0 - x, y0 - y);
+        SDL_RenderDrawPoint(renderer,x0 - y, y0 - x);
+        SDL_RenderDrawPoint(renderer,x0 + y, y0 - x);
+        SDL_RenderDrawPoint(renderer, x0 + x, y0 - y);
+
+        if (err <= 0)
+        {
+            y++;
+            err += dy;
+            dy += 2;
+        }
+        
+        if (err > 0)
+        {
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+    }
 }

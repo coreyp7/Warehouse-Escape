@@ -1,2 +1,2 @@
 all:
-	gcc -I include -L lib -o pong pong.c -lmingw32 -lSDL2main -lSDL2
+	g++ -I include -L lib -o 01 01.cpp -lmingw32 -lSDL2main -lSDL2
