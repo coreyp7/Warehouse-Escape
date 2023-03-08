@@ -1,4 +1,4 @@
-FILENAME = 06_extension_libraries_and_loading_other_image_formats
+FILENAME = 26_motion
 
 #OBJS specifies which files to compile as part of the project
 OBJS = src\$(FILENAME).cpp
@@ -20,7 +20,7 @@ LIBRARY_PATHS = -LC:\MinGW\lib
 COMPILER_FLAGS = -w -Wl,-subsystem,windows
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = exe\$(FILENAME)
