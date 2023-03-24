@@ -121,17 +121,17 @@ int main( int argc, char* args[] ){
 
     float avgFPS = 0.0;
 
-    SDL_Color textColor = { 0, 0, 0, 255 }; // black
-
-    // CHANGE: fps text stuff. Could put in an object or something.
-    int countedFrames = 0; // TEMPORARY: experimenting with showing live frames with this
-    std::stringstream countedFramesStr;
+    int countedFrames = 0; // keeps track of total frames rendered while application running
+    std::stringstream avgFpsStr; // string for displaying counted
 
     // Text objects to show.
+    SDL_Color textColor = { 0, 0, 0, 255 }; // black
     Text avgFpsText = Text(renderer, globalFont, textColor);
     Text msText = Text(renderer, globalFont, textColor);
     Text fpsText = Text(renderer, globalFont, textColor);
     fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
+
+    Box box = Box(renderer, boxTexture);
 
     // While game is running
     while(!quit){
@@ -146,6 +146,11 @@ int main( int argc, char* args[] ){
             }
         }
 
+        ///////////////////////////
+        //  PHYSICS STARTS HERE  //
+        ///////////////////////////
+        
+
         //Calculate avg fps
         avgFPS = countedFrames / ( SDL_GetTicks() / 1000.f );
         if( avgFPS > 2000000 )
@@ -153,14 +158,20 @@ int main( int argc, char* args[] ){
             avgFPS = 0;
         }
 
-        // Update avg fps
-        countedFramesStr.str("");
-        countedFramesStr << "Avg FPS: " << avgFPS;
-        avgFpsText.changeText(countedFramesStr.str().c_str());
+        // Update avg fps text
+        avgFpsStr.str("");
+        avgFpsStr << "Avg FPS: " << avgFPS;
+        avgFpsText.changeText(avgFpsStr.str().c_str());
 
-        // Rendering starts here.
+        ///////////////////////////
+        // RENDERING STARTS HERE //
+        ///////////////////////////
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
+
+        box.render(
+            (WINDOW_WIDTH-box.getWidth())/2, 
+            (WINDOW_HEIGHT-box.getHeight())/2);
 
         // show avg fps text & ms text
         avgFpsText.render(0, 0);

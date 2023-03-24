@@ -28,7 +28,7 @@
  */
 class Box {
 public:
-    Box(); // this one will probably be ignored
+    Box(SDL_Renderer* renderer, SDL_Texture* texture); // this one will probably be ignored
     ~Box(); // destructor, cleans up everything for this box.
 
     // Constructor that sets this box's SDL_Texture field "texture"
@@ -40,6 +40,10 @@ public:
     // ( Will use SDL_RenderCopyEx() )
     void render(int x, int y);
 
+    int getWidth();
+    int getHeight();
+
+
     
 
 private:
@@ -47,13 +51,16 @@ private:
     static const int BOX_WIDTH = 50;
     static const int BOX_HEIGHT = 50;
 
-    // The box's current x,y position on screen.
-    // Recall: y will be backwards, since origin
-    // is top left of window.
-    int positionX, positionY;
+    static const int CLICK_VELOCITY = 50;
 
     // "hardware texture" for this box. Obtained from constructor.
     SDL_Texture* texture;
+
+    int x, y;
+    int xvelocity, yvelocity;
+
+    SDL_Rect rect;
+    SDL_Renderer* renderer;
 
 
 };
