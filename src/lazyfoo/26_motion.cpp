@@ -108,6 +108,7 @@ class Dot
 
 		//Moves the dot
 		void move();
+		void move(float dt);
 
 		//Shows the dot on the screen
 		void render();
@@ -349,6 +350,32 @@ void Dot::move()
     }
 }
 
+// passes delta time
+void Dot::move(float dt)
+{
+    //Move the dot left or right
+    mPosX += mVelX * dt;
+	//printf("mVelX * dt = %d", mVelX * dt);
+	printf("mPosX = %i", mPosX);
+
+    //If the dot went too far to the left or right
+    if( ( mPosX < 0 ) || ( mPosX + DOT_WIDTH > SCREEN_WIDTH ) )
+    {
+        //Move back
+        //mPosX -= mVelX * dt;
+    }
+
+    //Move the dot up or down
+    mPosY += mVelY * dt;
+
+    //If the dot went too far up or down
+    if( ( mPosY < 0 ) || ( mPosY + DOT_HEIGHT > SCREEN_HEIGHT ) )
+    {
+        //Move back
+        //mPosY -= mVelY * dt;
+    }
+}
+
 void Dot::render()
 {
     //Show the dot
@@ -465,6 +492,10 @@ int main( int argc, char* args[] )
 			//The dot that will be moving around on the screen
 			Dot dot;
 
+			//float lastUpdate = 0.f; 
+			Uint32 lastUpdate = SDL_GetTicks(); // time (in ticks) when last frame was rendered
+
+
 			//While application is running
 			while( !quit )
 			{
@@ -481,8 +512,17 @@ int main( int argc, char* args[] )
 					dot.handleEvent( e );
 				}
 
+				Uint32 current = SDL_GetTicks();
+				
+				// how many seconds have passed since the last physics change.
+				float dt = (current - lastUpdate) / 1000.f;
+				//printf("dt = %f", dt);
+				
 				//Move the dot
-				dot.move();
+				dot.move(dt);
+
+				//update the time (ticks) of the physics update
+				lastUpdate = current;
 
 				//Clear screen
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
