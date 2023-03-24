@@ -1,6 +1,8 @@
 #include "Text.h"
 
 //TODO: add x y to constructor
+// Constructor.
+// NOTE: doesn't set any default text. Can't render until you call changeText.
 Text::Text(SDL_Renderer* rend, TTF_Font* customFont, SDL_Color customColor){
     textTexture = NULL;
     width = -1;
@@ -11,23 +13,6 @@ Text::Text(SDL_Renderer* rend, TTF_Font* customFont, SDL_Color customColor){
     font = customFont;
     color = customColor;
     renderer = rend;
-    
-    // initialize texture
-    // SDL_Surface* textSurface = TTF_RenderUTF8_Solid(font, , color);
-    // if(textSurface != NULL){
-    //     textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    //     if(textTexture == NULL){
-    //         printf("SOMETHING WENT WRONG IN Text::changeText");
-    //     }
-
-    //     width = textSurface->w;
-    //     height = textSurface->h;
-    //     printf("width set to %d", width);
-
-    //     SDL_FreeSurface(textSurface);
-    // } else {
-    //     printf("NULL");
-    // }
 }
 
 Text::~Text(){
@@ -46,6 +31,7 @@ void Text::free(){
 }
 
 // Changes text of this object.
+// If you can, don't do this every frame.
 void Text::changeText(std::string newText){
     
     free();
@@ -62,6 +48,8 @@ void Text::changeText(std::string newText){
         //printf("width set to %d", width);
 
         SDL_FreeSurface(textSurface);
+    } else {
+        printf("textSurface is null");
     }
 
 }

@@ -119,27 +119,19 @@ int main( int argc, char* args[] ){
     // Keep track of the time of each frame.
     int frameTimeToComplete = 0;
 
+    float avgFPS = 0.0;
+
     SDL_Color textColor = { 0, 0, 0, 255 }; // black
 
     // CHANGE: fps text stuff. Could put in an object or something.
     int countedFrames = 0; // TEMPORARY: experimenting with showing live frames with this
     std::stringstream countedFramesStr;
-    // SDL_Surface* fpsTextSurface = NULL;
-    // SDL_Texture* fpsTextTexture = NULL;
-    // SDL_Rect fpsTextLocation = { 
-    //     WINDOW_WIDTH, 
-    //     WINDOW_HEIGHT/2, 
-    //     250, 
-    //     250 };
 
-    // new stuff
+    // Text objects to show.
     Text avgFpsText = Text(renderer, globalFont, textColor);
-    //avgFpsText.setXY((0), 0);
-    // avgFpsText.setXY((WINDOW_WIDTH - avgFpsText.getWidth())/2, 0);
-    // printf("%d", (WINDOW_WIDTH - avgFpsText.getWidth())/2);
-    // printf("%d",avgFpsText.getWidth() );
-
-
+    Text msText = Text(renderer, globalFont, textColor);
+    Text fpsText = Text(renderer, globalFont, textColor);
+    fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
 
     // While game is running
     while(!quit){
@@ -154,51 +146,36 @@ int main( int argc, char* args[] ){
             }
         }
 
-        //Calculate and correct fps
-        float avgFPS = countedFrames / ( SDL_GetTicks() / 1000.f );
+        //Calculate avg fps
+        avgFPS = countedFrames / ( SDL_GetTicks() / 1000.f );
         if( avgFPS > 2000000 )
         {
             avgFPS = 0;
         }
 
+        // Update avg fps
         countedFramesStr.str("");
-        countedFramesStr << "Avg FPS (over entire session): " << avgFPS;
-
-        // Create surface/texture for fps text and render.
-        // fpsTextSurface = TTF_RenderUTF8_Solid(globalFont, countedFramesStr.str().c_str(), textColor);
-        // if(fpsTextSurface != NULL){
-        //     fpsTextTexture = SDL_CreateTextureFromSurface(renderer, fpsTextSurface);
-        //     fpsTextLocation.w = fpsTextSurface->w;
-        //     fpsTextLocation.h = fpsTextSurface->h;
-        //     fpsTextLocation.x = (WINDOW_WIDTH - fpsTextSurface->w) / 2;
-        //     fpsTextLocation.y = 0;
-        //     SDL_FreeSurface(fpsTextSurface);
-        // }
+        countedFramesStr << "Avg FPS: " << avgFPS;
         avgFpsText.changeText(countedFramesStr.str().c_str());
 
         // Rendering starts here.
-        // // Clear screen and move back buffer to front
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
-        // if(fpsTextTexture != NULL){
-        //     SDL_RenderCopyEx(renderer, fpsTextTexture, NULL, &fpsTextLocation, 0, NULL, SDL_FLIP_NONE);
-        // } else {
-        //     printf("fpsTextTexture == NULL");
-        // }
+        // show avg fps text & ms text
         avgFpsText.render(0, 0);
+        msText.changeText("ms render frame: "+std::to_string(SDL_GetTicks() - frameStart));
+        msText.render(0, avgFpsText.getHeight());
+        fpsText.render(0, avgFpsText.getHeight() + msText.getHeight());
 
-        
         SDL_RenderPresent(renderer);
-        countedFrames++;
+        countedFrames++; // NOTE: not sure if this should be lower in loop
 
-        // Finished rendering, cap framerate
-        frameTimeToComplete = SDL_GetTicks() - frameStart;
-
+        // Finished rendering, cap framerate.
         // If frame is finished early, wait remaining time.
+        frameTimeToComplete = SDL_GetTicks() - frameStart;
         if(1000 / fpsCap > frameTimeToComplete){
             SDL_Delay((1000/fpsCap) - frameTimeToComplete);
-            //printf("countedFrames reset.");
         }
 
     }
