@@ -121,6 +121,8 @@ int main( int argc, char* args[] ){
 
     float avgFPS = 0.0;
 
+    float dt = 0.0;
+
     int countedFrames = 0; // keeps track of total frames rendered while application running
     std::stringstream avgFpsStr; // string for displaying counted
 
@@ -130,8 +132,12 @@ int main( int argc, char* args[] ){
     Text msText = Text(renderer, globalFont, textColor);
     Text fpsText = Text(renderer, globalFont, textColor);
     fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
+    Text boxText = Text(renderer, globalFont, textColor);
 
-    Box box = Box(renderer, boxTexture);
+    Box box = Box(renderer, boxTexture, 
+    (WINDOW_WIDTH-50)/2, 
+    //(WINDOW_HEIGHT-50)/2);
+    0);
 
     // While game is running
     while(!quit){
@@ -149,7 +155,9 @@ int main( int argc, char* args[] ){
         ///////////////////////////
         //  PHYSICS STARTS HERE  //
         ///////////////////////////
-        
+
+        dt = (SDL_GetTicks() - box.lastPhysicsUpdate) / 1000.0f;
+        box.simulatePhysics(dt);
 
         //Calculate avg fps
         avgFPS = countedFrames / ( SDL_GetTicks() / 1000.f );
@@ -169,15 +177,17 @@ int main( int argc, char* args[] ){
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
-        box.render(
-            (WINDOW_WIDTH-box.getWidth())/2, 
-            (WINDOW_HEIGHT-box.getHeight())/2);
+        box.render();
 
         // show avg fps text & ms text
         avgFpsText.render(0, 0);
         msText.changeText("ms render frame: "+std::to_string(SDL_GetTicks() - frameStart));
         msText.render(0, avgFpsText.getHeight());
         fpsText.render(0, avgFpsText.getHeight() + msText.getHeight());
+        std::ostringstream oss;
+        oss << "x:" << box.getX() << ", y:" << box.getY();
+        boxText.changeText(oss.str());
+        boxText.render(WINDOW_WIDTH - boxText.getWidth(), 0);
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop

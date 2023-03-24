@@ -1,24 +1,41 @@
 #include "Box.h"
+#include <cmath>
 
-Box::Box(SDL_Renderer* renderer, SDL_Texture* texture) {
+Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float startingPosY) {
     // constructor stuff go here
     this->texture = texture;
 
-    x = 0;
-    y = 0;
+    x = startingPosX;
+    y = startingPosY;
     xvelocity = 0;
     yvelocity = 0;
 
     this->renderer = renderer;
+
+    lastPhysicsUpdate = 0;
 }
 
-void Box::render(int posx, int posy){
+void Box::simulatePhysics(float dt){
+    yvelocity = dt * GRAVITY;
+    y += yvelocity * dt;
+    x += xvelocity * dt;
+
+    // if(x < 0){
+    //     x = 0;
+    // }
+    if(y > 400.0){
+        y = 400.0;
+    }
+}
+
+void Box::renderTESTINGONLY(int posx, int posy){
     rect = {posx, posy, BOX_WIDTH, BOX_HEIGHT};
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
 }
 
-Box::~Box() {
-    // destructor stuff go here
+void Box::render(){
+    rect = {static_cast<int>(round(x)), static_cast<int>(round(y)), BOX_WIDTH, BOX_HEIGHT};
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
 }
 
 int Box::getWidth(){
@@ -27,5 +44,17 @@ int Box::getWidth(){
 
 int Box::getHeight(){
     return BOX_HEIGHT;
+}
+
+float Box::getX(){
+    return x;
+}
+
+float Box::getY(){
+    return y;
+}
+
+Box::~Box() {
+    // destructor stuff go here
 }
 

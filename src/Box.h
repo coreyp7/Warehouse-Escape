@@ -27,40 +27,44 @@
  * This could actually prove to be a simple game to create.
  */
 class Box {
-public:
-    Box(SDL_Renderer* renderer, SDL_Texture* texture); // this one will probably be ignored
-    ~Box(); // destructor, cleans up everything for this box.
+    public:
+        Uint32 lastPhysicsUpdate;
 
-    // Constructor that sets this box's SDL_Texture field "texture"
-    // with an alredy created SDL_Texture.
-    Box(SDL_Texture* boxTexture);
-    
-    // Render this box at the specified x,y location
-    // Abstracts all the SDL calls for rendering stuff for us.
-    // ( Will use SDL_RenderCopyEx() )
-    void render(int x, int y);
+        Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float startingPosY);
+        ~Box(); // destructor, cleans up everything for this box.
 
-    int getWidth();
-    int getHeight();
+        // Constructor that sets this box's SDL_Texture field "texture"
+        // with an alredy created SDL_Texture.
+        Box(SDL_Texture* boxTexture);
+        
+        // Render this box at the specified x,y location
+        // Abstracts all the SDL calls for rendering stuff for us.
+        // ( Will use SDL_RenderCopyEx() )
+        void render();
+        void renderTESTINGONLY(int posx, int posy);
 
+        int getWidth();
+        int getHeight();
+        float getX();
+        float getY();
 
-    
+        void simulatePhysics(float dt);
 
-private:
-    // Box's size is hardcoded.
-    static const int BOX_WIDTH = 50;
-    static const int BOX_HEIGHT = 50;
+    private:
+        // Box's size is hardcoded.
+        static const int BOX_WIDTH = 50;
+        static const int BOX_HEIGHT = 50;
 
-    static const int CLICK_VELOCITY = 50;
+        static const int CLICK_VELOCITY = 50;
 
-    // "hardware texture" for this box. Obtained from constructor.
-    SDL_Texture* texture;
+        const float GRAVITY = 30.0f; 
 
-    int x, y;
-    int xvelocity, yvelocity;
+        // "hardware texture" for this box. Obtained from constructor.
+        SDL_Texture* texture;
 
-    SDL_Rect rect;
-    SDL_Renderer* renderer;
+        float x, y;
+        float xvelocity, yvelocity;
 
-
+        SDL_Rect rect;
+        SDL_Renderer* renderer;
 };
