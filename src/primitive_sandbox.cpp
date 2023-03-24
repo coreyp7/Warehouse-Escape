@@ -7,6 +7,7 @@
 
 // local object stuff
 #include "Box.h" // api for box object stuff
+#include "Text.h"
 
 // Defining some global constants + other shit
 const int WINDOW_WIDTH = 640;
@@ -123,13 +124,21 @@ int main( int argc, char* args[] ){
     // CHANGE: fps text stuff. Could put in an object or something.
     int countedFrames = 0; // TEMPORARY: experimenting with showing live frames with this
     std::stringstream countedFramesStr;
-    SDL_Surface* fpsTextSurface = NULL;
-    SDL_Texture* fpsTextTexture = NULL;
-    SDL_Rect fpsTextLocation = { 
-        WINDOW_WIDTH, 
-        WINDOW_HEIGHT/2, 
-        250, 
-        250 };
+    // SDL_Surface* fpsTextSurface = NULL;
+    // SDL_Texture* fpsTextTexture = NULL;
+    // SDL_Rect fpsTextLocation = { 
+    //     WINDOW_WIDTH, 
+    //     WINDOW_HEIGHT/2, 
+    //     250, 
+    //     250 };
+
+    // new stuff
+    Text avgFpsText = Text(renderer, globalFont, textColor);
+    //avgFpsText.setXY((0), 0);
+    // avgFpsText.setXY((WINDOW_WIDTH - avgFpsText.getWidth())/2, 0);
+    // printf("%d", (WINDOW_WIDTH - avgFpsText.getWidth())/2);
+    // printf("%d",avgFpsText.getWidth() );
+
 
 
     // While game is running
@@ -156,26 +165,28 @@ int main( int argc, char* args[] ){
         countedFramesStr << "Avg FPS (over entire session): " << avgFPS;
 
         // Create surface/texture for fps text and render.
-        fpsTextSurface = TTF_RenderUTF8_Solid(globalFont, countedFramesStr.str().c_str(), textColor);
-        if(fpsTextSurface != NULL){
-            fpsTextTexture = SDL_CreateTextureFromSurface(renderer, fpsTextSurface);
-            fpsTextLocation.w = fpsTextSurface->w;
-            fpsTextLocation.h = fpsTextSurface->h;
-            fpsTextLocation.x = (WINDOW_WIDTH - fpsTextSurface->w) / 2;
-            fpsTextLocation.y = 0;
-            SDL_FreeSurface(fpsTextSurface);
-        }
+        // fpsTextSurface = TTF_RenderUTF8_Solid(globalFont, countedFramesStr.str().c_str(), textColor);
+        // if(fpsTextSurface != NULL){
+        //     fpsTextTexture = SDL_CreateTextureFromSurface(renderer, fpsTextSurface);
+        //     fpsTextLocation.w = fpsTextSurface->w;
+        //     fpsTextLocation.h = fpsTextSurface->h;
+        //     fpsTextLocation.x = (WINDOW_WIDTH - fpsTextSurface->w) / 2;
+        //     fpsTextLocation.y = 0;
+        //     SDL_FreeSurface(fpsTextSurface);
+        // }
+        avgFpsText.changeText(countedFramesStr.str().c_str());
 
         // Rendering starts here.
         // // Clear screen and move back buffer to front
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
-        if(fpsTextTexture != NULL){
-            SDL_RenderCopyEx(renderer, fpsTextTexture, NULL, &fpsTextLocation, 0, NULL, SDL_FLIP_NONE);
-        } else {
-            printf("fpsTextTexture == NULL");
-        }
+        // if(fpsTextTexture != NULL){
+        //     SDL_RenderCopyEx(renderer, fpsTextTexture, NULL, &fpsTextLocation, 0, NULL, SDL_FLIP_NONE);
+        // } else {
+        //     printf("fpsTextTexture == NULL");
+        // }
+        avgFpsText.render(0, 0);
 
         
         SDL_RenderPresent(renderer);

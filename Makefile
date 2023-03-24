@@ -1,7 +1,7 @@
 FILENAME = primitive_sandbox
 
 #OBJS specifies which files to compile as part of the project
-OBJS = src\$(FILENAME).cpp
+OBJS = src\$(FILENAME).cpp src\Text.cpp
 
 #CC specifies which compiler we're using
 CC = g++
