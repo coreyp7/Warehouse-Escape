@@ -15,6 +15,7 @@ Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float
 
     lastPhysicsUpdate = 0;
     applyForceJump = false;
+
 }
 
 void Box::simulatePhysics(float dt){
@@ -22,11 +23,17 @@ void Box::simulatePhysics(float dt){
     y += yvelocity * dt;
     x += xvelocity * dt;
 
-    // if(x < 0){
-    //     x = 0;
-    // }
+    if(x < 0){
+        x = 0;
+    }
+    if(x > X_LIMIT){
+        x = X_LIMIT;
+    }
+
+    // CHANGE: this should happen on collision detection not hardcoded
     if(y > 400.0){
         y = 400.0;
+        xvelocity = 0; // stop box on land
     }
 
     lastPhysicsUpdate = SDL_GetTicks();
@@ -34,6 +41,10 @@ void Box::simulatePhysics(float dt){
 
 void Box::applyForceUp(){
     yvelocity = CLICK_VELOCITY;
+}
+
+void Box::applyXVelocity(float force){
+    xvelocity = force;
 }
 
 void Box::renderTESTINGONLY(int posx, int posy){

@@ -154,26 +154,41 @@ int main( int argc, char* args[] ){
                     quit = true;
                     break;
                 case SDL_MOUSEBUTTONDOWN:
-                    /*
-                    TODO:
-                    - get location of mouse press.
-                    - get location of box.
-                    if they intersect:
-                    - apply force to box
-                    */
+                    // If box is clicked, apply upward force to it.
                     int xmousepos = e.button.x;
                     int ymousepos = e.button.y;
 
                     int xbox = box.getX();
                     int ybox = box.getY();
 
-                    // if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
-                    // ymousepos < ybox && ymousepos > ybox + box.getHeight())
+                    // If click was inside the box
                     if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
+                        // apply vertical
                         printf("box.applyForceUp()");
                         box.applyForceUp();
+
+                        // apply horizontal
+                        
+                        // center (x only) of box
+                        float center = xbox + (box.getWidth()/2);
+
+                        // Figure out how much force to apply to xvelocity.
+                        // (further from the center, the more force).
+                        float xForce = 0.0;
+                        int scaling = 20;
+                        if(xmousepos < center){
+                            xForce = ((box.getWidth()/2) + xbox) - xmousepos;
+                        } else if(xmousepos > center){
+                            // negative bc its going right
+                            xForce = -(xmousepos - ((box.getWidth()/2) + xbox));
+                        } else { 
+                            // exactly center (should never really happen)
+                            //TODO
+                        }
+
+                        box.applyXVelocity(xForce*scaling);
                     }
                     
                     break;

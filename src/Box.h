@@ -50,6 +50,7 @@ class Box {
 
         void simulatePhysics(float dt);
         void applyForceUp();
+        void applyXVelocity(float force);
 
     private:
         // Box's size is hardcoded.
@@ -59,6 +60,9 @@ class Box {
         static constexpr float CLICK_VELOCITY = -500.0;
 
         static constexpr float GRAVITY = 700.0f; 
+
+        // CHANGE: pass value from main to allow for multiple screen sizes.
+        static const int X_LIMIT = 400; 
 
         // "hardware texture" for this box. Obtained from constructor.
         SDL_Texture* texture;
