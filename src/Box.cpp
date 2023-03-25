@@ -1,5 +1,6 @@
 #include "Box.h"
 #include <cmath>
+#include <stdio.h>
 
 Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float startingPosY) {
     // constructor stuff go here
@@ -13,10 +14,11 @@ Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float
     this->renderer = renderer;
 
     lastPhysicsUpdate = 0;
+    applyForceJump = false;
 }
 
 void Box::simulatePhysics(float dt){
-    yvelocity = dt * GRAVITY;
+    yvelocity += dt * GRAVITY;
     y += yvelocity * dt;
     x += xvelocity * dt;
 
@@ -26,6 +28,12 @@ void Box::simulatePhysics(float dt){
     if(y > 400.0){
         y = 400.0;
     }
+
+    lastPhysicsUpdate = SDL_GetTicks();
+}
+
+void Box::applyForceUp(){
+    yvelocity = CLICK_VELOCITY;
 }
 
 void Box::renderTESTINGONLY(int posx, int posy){
@@ -36,6 +44,9 @@ void Box::renderTESTINGONLY(int posx, int posy){
 void Box::render(){
     rect = {static_cast<int>(round(x)), static_cast<int>(round(y)), BOX_WIDTH, BOX_HEIGHT};
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    // SDL_RenderDrawPoint(renderer, x, y);
+    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 }
 
 int Box::getWidth(){

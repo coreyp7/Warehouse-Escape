@@ -136,7 +136,6 @@ int main( int argc, char* args[] ){
 
     Box box = Box(renderer, boxTexture, 
     (WINDOW_WIDTH-50)/2, 
-    //(WINDOW_HEIGHT-50)/2);
     0);
 
     // While game is running
@@ -146,9 +145,38 @@ int main( int argc, char* args[] ){
         // Go through event queue
         while( SDL_PollEvent( &e ) != 0 ){
             
-            // User requests quit
-            if (e.type == SDL_QUIT){
-                quit = true;
+            // // User requests quit
+            // if (e.type == SDL_QUIT){
+            //     quit = true;
+            // }
+            switch (e.type){
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    /*
+                    TODO:
+                    - get location of mouse press.
+                    - get location of box.
+                    if they intersect:
+                    - apply force to box
+                    */
+                    int xmousepos = e.button.x;
+                    int ymousepos = e.button.y;
+
+                    int xbox = box.getX();
+                    int ybox = box.getY();
+
+                    // if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
+                    // ymousepos < ybox && ymousepos > ybox + box.getHeight())
+                    if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
+                    ymousepos > ybox && ymousepos < ybox+box.getHeight())
+                    {
+                        printf("box.applyForceUp()");
+                        box.applyForceUp();
+                    }
+                    
+                    break;
             }
         }
 

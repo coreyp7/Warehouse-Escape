@@ -49,21 +49,24 @@ class Box {
         float getY();
 
         void simulatePhysics(float dt);
+        void applyForceUp();
 
     private:
         // Box's size is hardcoded.
         static const int BOX_WIDTH = 50;
         static const int BOX_HEIGHT = 50;
 
-        static const int CLICK_VELOCITY = 50;
+        static constexpr float CLICK_VELOCITY = -500.0;
 
-        const float GRAVITY = 30.0f; 
+        static constexpr float GRAVITY = 700.0f; 
 
         // "hardware texture" for this box. Obtained from constructor.
         SDL_Texture* texture;
 
         float x, y;
         float xvelocity, yvelocity;
+
+        bool applyForceJump;
 
         SDL_Rect rect;
         SDL_Renderer* renderer;
