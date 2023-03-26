@@ -23,8 +23,11 @@ SDL_Texture* boxTexture;
 
 TTF_Font* globalFont;
 
+SDL_Texture* bgTexture;
+
 void close(){
     SDL_DestroyTexture( boxTexture );
+    SDL_DestroyTexture( bgTexture );
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(mainWindow);
     boxTexture = NULL;
@@ -38,6 +41,12 @@ bool loadMedia(){
 
     boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box.png");
     if(boxTexture == NULL){
+        printf("Couldn't load box texture. %s", IMG_GetError());
+        success = false;
+    }
+
+    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/vertical_bg.png");
+    if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
     }
@@ -133,12 +142,14 @@ int main( int argc, char* args[] ){
     Text fpsText = Text(renderer, globalFont, textColor);
     fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
     Text boxText = Text(renderer, globalFont, textColor);
+    Text cameraText = Text(renderer, globalFont, textColor);
 
     Box box = Box(renderer, boxTexture, 
     (WINDOW_WIDTH-50)/2, 
     0);
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+    SDL_Rect reverseCamera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
     // While game is running
     while(!quit){
@@ -237,6 +248,9 @@ int main( int argc, char* args[] ){
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
+        reverseCamera.y = -camera.y;
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &reverseCamera, 0, NULL, SDL_FLIP_NONE);
+
         //box.render();
         box.render(camera.x, camera.y);
 
@@ -249,6 +263,10 @@ int main( int argc, char* args[] ){
         oss << "x:" << box.getX() << ", y:" << box.getY();
         boxText.changeText(oss.str());
         boxText.render(WINDOW_WIDTH - boxText.getWidth(), 0);
+        std::ostringstream oss2;
+        oss2 << "cam | x:" << camera.x << ", y:" << camera.y;
+        cameraText.changeText(oss2.str());
+        cameraText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight());
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop
