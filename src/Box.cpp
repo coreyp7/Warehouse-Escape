@@ -52,6 +52,11 @@ void Box::renderTESTINGONLY(int posx, int posy){
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
 }
 
+void Box::render(int xcam, int ycam){
+    rect = {static_cast<int>(round(x)) - xcam, static_cast<int>(round(y) - ycam), BOX_WIDTH, BOX_HEIGHT};
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+}
+
 void Box::render(){
     rect = {static_cast<int>(round(x)), static_cast<int>(round(y)), BOX_WIDTH, BOX_HEIGHT};
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);

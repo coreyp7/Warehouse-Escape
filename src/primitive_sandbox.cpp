@@ -138,6 +138,8 @@ int main( int argc, char* args[] ){
     (WINDOW_WIDTH-50)/2, 
     0);
 
+    SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
     // While game is running
     while(!quit){
         frameStart = SDL_GetTicks(); // mark time(in m/s) at start of this frame
@@ -158,8 +160,8 @@ int main( int argc, char* args[] ){
                     int xmousepos = e.button.x;
                     int ymousepos = e.button.y;
 
-                    int xbox = box.getX();
-                    int ybox = box.getY();
+                    int xbox = box.getX() - camera.x;
+                    int ybox = box.getY() - camera.y;
 
                     // If click was inside the box
                     if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
@@ -202,6 +204,21 @@ int main( int argc, char* args[] ){
         dt = (SDL_GetTicks() - box.lastPhysicsUpdate) / 1000.0f;
         box.simulatePhysics(dt);
 
+        // We moved the box; now adjust the camera if needed.
+        // If box goes higher than -50 above camera, offset camera higher
+        if(box.getY() < camera.y - 50){
+            camera.y = box.getY() + 50;
+        }
+        // basic behavior
+        // if(box.getY() < camera.y){
+        //     camera.y = box.getY();
+        // }
+        // Same as current behavior but adjusts camera when box position < camera.y + 50.
+        // Looks worse.
+        // if(box.getY() < camera.y + 50){
+        //     camera.y = box.getY() - 50;
+        // }
+
         //Calculate avg fps
         avgFPS = countedFrames / ( SDL_GetTicks() / 1000.f );
         if( avgFPS > 2000000 )
@@ -220,7 +237,8 @@ int main( int argc, char* args[] ){
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
-        box.render();
+        //box.render();
+        box.render(camera.x, camera.y);
 
         // show avg fps text & ms text
         avgFpsText.render(0, 0);

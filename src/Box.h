@@ -41,6 +41,8 @@ class Box {
         // Abstracts all the SDL calls for rendering stuff for us.
         // ( Will use SDL_RenderCopyEx() )
         void render();
+        // Render this Box relative to the camera's position.
+        void render(int xcam, int ycam);
         void renderTESTINGONLY(int posx, int posy);
 
         int getWidth();
