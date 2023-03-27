@@ -24,6 +24,7 @@ SDL_Texture* boxTexture;
 TTF_Font* globalFont;
 
 SDL_Texture* bgTexture;
+int bgTextureHeight;
 
 void close(){
     SDL_DestroyTexture( boxTexture );
@@ -45,11 +46,12 @@ bool loadMedia(){
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/vertical_bg.png");
+    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/clouds.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
     }
+    SDL_QueryTexture(bgTexture, NULL, NULL, NULL, &bgTextureHeight);
 
     // load font into global font
     globalFont = TTF_OpenFont("img/primitive_sandbox/Lato-Black.ttf", 26);
@@ -249,6 +251,8 @@ int main( int argc, char* args[] ){
         SDL_RenderClear(renderer);
 
         reverseCamera.y = -camera.y;
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &reverseCamera, 0, NULL, SDL_FLIP_NONE);
+        reverseCamera.y = reverseCamera.y - bgTextureHeight;
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &reverseCamera, 0, NULL, SDL_FLIP_NONE);
 
         //box.render();
