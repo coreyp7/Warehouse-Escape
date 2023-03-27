@@ -145,6 +145,7 @@ int main( int argc, char* args[] ){
     fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
     Text boxText = Text(renderer, globalFont, textColor);
     Text cameraText = Text(renderer, globalFont, textColor);
+    Text offsetText = Text(renderer, globalFont, textColor);
 
     Box box = Box(renderer, boxTexture, 
     (WINDOW_WIDTH-50)/2, 
@@ -152,6 +153,9 @@ int main( int argc, char* args[] ){
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
     SDL_Rect reverseCamera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+    int offset = 0; // for offsetting the background images.
+    int newStart = 0; // indicates where scrolling should begin again.
 
     // While game is running
     while(!quit){
@@ -220,7 +224,9 @@ int main( int argc, char* args[] ){
         // We moved the box; now adjust the camera if needed.
         // If box goes higher than -50 above camera, offset camera higher
         if(box.getY() < camera.y - 50){
+            int oldCamY = camera.y;
             camera.y = box.getY() + 50;
+            offset += abs(camera.y - oldCamY);
         }
         // basic behavior
         // if(box.getY() < camera.y){
@@ -250,10 +256,28 @@ int main( int argc, char* args[] ){
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
-        reverseCamera.y = -camera.y;
-        SDL_RenderCopyEx(renderer, bgTexture, NULL, &reverseCamera, 0, NULL, SDL_FLIP_NONE);
-        reverseCamera.y = reverseCamera.y - bgTextureHeight;
-        SDL_RenderCopyEx(renderer, bgTexture, NULL, &reverseCamera, 0, NULL, SDL_FLIP_NONE);
+        if(offset > bgTextureHeight){
+            // When the first bg goes offscreen (offset > bgTextureHeight), 
+            // the offset is restarted and the "newStart" (which indicates the new top of bg1) 
+            // is set to the camera's y position.
+            offset = 0;
+            newStart = camera.y;
+            printf("camera.y + (offset*2):%d, newStart:%d", camera.y + (offset*2), newStart);
+        }
+
+        // oldtodo: recall the confusion of this working.
+        // printf it and camera.y + (offset*2) is the same value as newStart.
+        // ACTUALLY: nevermind I figured out why this worked. I understood this in the moment
+        // while troubleshooting but was astounded that a solution actually worked for once.
+        // Nice job.
+        // TODO: initialize these variables outside while loop so you're not creating it everytime.
+        SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
+        SDL_Rect bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h };
+
+        //reverseCamera.y = -camera.y;
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
+        //reverseCamera.y = reverseCamera.y - bgTextureHeight;
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
 
         //box.render();
         box.render(camera.x, camera.y);
@@ -271,6 +295,10 @@ int main( int argc, char* args[] ){
         oss2 << "cam | x:" << camera.x << ", y:" << camera.y;
         cameraText.changeText(oss2.str());
         cameraText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight());
+        std::ostringstream oss3;
+        oss3 << "newstart:" << newStart;
+        offsetText.changeText(oss3.str());
+        offsetText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight() + cameraText.getHeight());
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop
