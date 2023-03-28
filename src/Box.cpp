@@ -26,8 +26,13 @@ void Box::simulatePhysics(float dt){
     if(x < 0){
         x = 0;
     }
-    if(x > X_LIMIT){
-        x = X_LIMIT;
+
+    // Don't allow box to go outside x min/max bounds.
+    if(x > X_MAX_LIMIT){
+        x = X_MAX_LIMIT;
+    }
+    else if(x < X_MIN_LIMIT){
+        x = X_MIN_LIMIT;
     }
 
     // CHANGE: this should happen on collision detection not hardcoded

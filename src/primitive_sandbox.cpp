@@ -152,7 +152,6 @@ int main( int argc, char* args[] ){
     0);
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
-    SDL_Rect reverseCamera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
     int offset = 0; // for offsetting the background images.
     int newStart = 0; // indicates where scrolling should begin again.
@@ -274,9 +273,7 @@ int main( int argc, char* args[] ){
         SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
         SDL_Rect bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h };
 
-        //reverseCamera.y = -camera.y;
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
-        //reverseCamera.y = reverseCamera.y - bgTextureHeight;
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
 
         //box.render();
