@@ -49,10 +49,13 @@ class Box {
         int getHeight();
         float getX();
         float getY();
+        float getXVelocity();
+        float getYVelocity();
 
         void simulatePhysics(float dt);
         void applyForceUp();
         void applyXVelocity(float force);
+        void applyXYVelocity(float xForce, float yForce);
 
     private:
         // Box's size is hardcoded.

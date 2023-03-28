@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string> // TODO: look into how this shit works at all
 #include <sstream>
+#include <cmath>
 
 // local object stuff
 #include "Box.h" // api for box object stuff
@@ -184,8 +185,22 @@ int main( int argc, char* args[] ){
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
                         // apply vertical
-                        printf("box.applyForceUp()");
-                        box.applyForceUp();
+                        //printf("box.applyForceUp()");
+                        //box.applyForceUp();
+                        int scaling = 20;
+
+                        float yCenter = ybox + (box.getHeight()/2);
+                        float yForce = 0.0;
+
+                        if(ymousepos > yCenter){
+                            // move up (negative)
+                            yForce = -fabs(ymousepos - yCenter);
+                        } else if(ymousepos < yCenter){
+                            // move down (positive)
+                            yForce = fabs(yCenter - ymousepos);
+                        }
+                        printf("yCenter:%f, ymousepos:%i, yForce:%f", yCenter, ymousepos, yForce);
+                        //printf("yforce:%d", yForce);
 
                         // apply horizontal
                         
@@ -195,7 +210,7 @@ int main( int argc, char* args[] ){
                         // Figure out how much force to apply to xvelocity.
                         // (further from the center, the more force).
                         float xForce = 0.0;
-                        int scaling = 20;
+
                         if(xmousepos < center){
                             xForce = ((box.getWidth()/2) + xbox) - xmousepos;
                         } else if(xmousepos > center){
@@ -206,7 +221,8 @@ int main( int argc, char* args[] ){
                             //TODO
                         }
 
-                        box.applyXVelocity(xForce*scaling);
+                        //box.applyXVelocity(xForce*scaling);
+                        box.applyXYVelocity(xForce*scaling, yForce*scaling);
                     }
                     
                     break;
@@ -225,7 +241,7 @@ int main( int argc, char* args[] ){
         if(box.getY() < camera.y - 50){
             int oldCamY = camera.y;
             camera.y = box.getY() + 50;
-            offset += abs(camera.y - oldCamY);
+            offset += fabs(camera.y - oldCamY);
         }
         // basic behavior
         // if(box.getY() < camera.y){
@@ -296,6 +312,7 @@ int main( int argc, char* args[] ){
         oss3 << "newstart:" << newStart;
         offsetText.changeText(oss3.str());
         offsetText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight() + cameraText.getHeight());
+
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop

@@ -52,6 +52,11 @@ void Box::applyXVelocity(float force){
     xvelocity = force;
 }
 
+void Box::applyXYVelocity(float xForce, float yForce){
+    xvelocity = xForce;
+    yvelocity = yForce;
+}
+
 void Box::renderTESTINGONLY(int posx, int posy){
     rect = {posx, posy, BOX_WIDTH, BOX_HEIGHT};
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
@@ -84,6 +89,14 @@ float Box::getX(){
 
 float Box::getY(){
     return y;
+}
+
+float Box::getYVelocity(){
+    return yvelocity;
+}
+
+float Box::getXVelocity(){
+    return xvelocity;
 }
 
 Box::~Box() {
