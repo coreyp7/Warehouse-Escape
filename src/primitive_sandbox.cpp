@@ -11,7 +11,9 @@
 #include "Text.h"
 
 // Defining some global constants + other shit
-const int WINDOW_WIDTH = 640;
+// const int WINDOW_WIDTH = 640;
+// const int WINDOW_HEIGHT = 480;
+const int WINDOW_WIDTH = 720;
 const int WINDOW_HEIGHT = 480;
 
 // FPS Cap when rendering. 60 by default.
@@ -41,7 +43,7 @@ void close(){
 bool loadMedia(){
     bool success = true;
 
-    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box.png");
+    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/boxBig.png");
     if(boxTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
@@ -146,7 +148,7 @@ int main( int argc, char* args[] ){
     fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
     Text boxText = Text(renderer, globalFont, textColor);
     Text cameraText = Text(renderer, globalFont, textColor);
-    Text offsetText = Text(renderer, globalFont, textColor);
+    Text velocityText = Text(renderer, globalFont, textColor);
 
     Box box = Box(renderer, boxTexture, 
     (WINDOW_WIDTH-50)/2, 
@@ -195,11 +197,13 @@ int main( int argc, char* args[] ){
                         if(ymousepos > yCenter){
                             // move up (negative)
                             yForce = -fabs(ymousepos - yCenter);
+                            //yForce = -20;
                         } else if(ymousepos < yCenter){
                             // move down (positive)
                             yForce = fabs(yCenter - ymousepos);
+                            //yForce = 20;
                         }
-                        printf("yCenter:%f, ymousepos:%i, yForce:%f", yCenter, ymousepos, yForce);
+                        //printf("yCenter:%f, ymousepos:%i, yForce:%f", yCenter, ymousepos, yForce);
                         //printf("yforce:%d", yForce);
 
                         // apply horizontal
@@ -243,6 +247,9 @@ int main( int argc, char* args[] ){
             camera.y = box.getY() + 50;
             offset += fabs(camera.y - oldCamY);
         }
+        //TODO: maybe add camera movement down, leaning towards not doing it
+        // even though I want to
+
         // basic behavior
         // if(box.getY() < camera.y){
         //     camera.y = box.getY();
@@ -277,7 +284,7 @@ int main( int argc, char* args[] ){
             // is set to the camera's y position.
             offset = 0;
             newStart = camera.y;
-            printf("camera.y + (offset*2):%d, newStart:%d", camera.y + (offset*2), newStart);
+            //printf("camera.y + (offset*2):%d, newStart:%d", camera.y + (offset*2), newStart);
         }
 
         // oldtodo: recall the confusion of this working.
@@ -309,10 +316,9 @@ int main( int argc, char* args[] ){
         cameraText.changeText(oss2.str());
         cameraText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight());
         std::ostringstream oss3;
-        oss3 << "newstart:" << newStart;
-        offsetText.changeText(oss3.str());
-        offsetText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight() + cameraText.getHeight());
-
+        oss3 << "velocity: (" << box.getXVelocity() << ", " << box.getYVelocity() << ")";
+        velocityText.changeText(oss3.str());
+        velocityText.render(WINDOW_WIDTH - velocityText.getWidth(), boxText.getHeight() + cameraText.getHeight());
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop

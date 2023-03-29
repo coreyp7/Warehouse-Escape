@@ -36,9 +36,17 @@ void Box::simulatePhysics(float dt){
     }
 
     // CHANGE: this should happen on collision detection not hardcoded
-    if(y > 400.0){
+    if(y > 400.0){ // onground
         y = 400.0;
-        xvelocity = 0; // stop box on land
+        yvelocity = 0;
+        if(xvelocity > 4){
+            xvelocity += dt * (-X_FRICTION);
+        } else if(xvelocity < -4){
+            xvelocity += dt * X_FRICTION;
+        } else {
+            xvelocity = 0;
+        }
+        //xvelocity = 0; // stop box on land
     }
 
     lastPhysicsUpdate = SDL_GetTicks();

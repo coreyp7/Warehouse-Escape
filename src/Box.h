@@ -59,12 +59,15 @@ class Box {
 
     private:
         // Box's size is hardcoded.
-        static const int BOX_WIDTH = 50;
-        static const int BOX_HEIGHT = 50;
+        // static const int BOX_WIDTH = 50;
+        // static const int BOX_HEIGHT = 50;
+        static const int BOX_WIDTH = 75;
+        static const int BOX_HEIGHT = 75;
 
         static constexpr float CLICK_VELOCITY = -500.0;
 
         static constexpr float GRAVITY = 700.0f; 
+        static constexpr float X_FRICTION = 700.0f;
 
         // CHANGE: pass value from main to allow for multiple screen sizes.
         static const int X_MAX_LIMIT = 565; 
