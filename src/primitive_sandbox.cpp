@@ -253,7 +253,7 @@ int main( int argc, char* args[] ){
         ///////////////////////////
 
         dt = (SDL_GetTicks() - box.lastPhysicsUpdate) / 1000.0f;
-        box.simulatePhysics(dt);
+        box.simulatePhysics(dt, tiles[0]);
 
         // We moved the box; now adjust the camera if needed.
         // If box goes higher than -50 above camera, offset camera higher

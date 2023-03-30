@@ -1,5 +1,7 @@
 #pragma once
 #include <SDL.h>
+class Tile; // resolves circular dependency
+#include "Tile.h"
 
 
 /*
@@ -53,11 +55,10 @@ class Box {
         float getYVelocity();
 
         void simulatePhysics(float dt);
+        void simulatePhysics(float dt, Tile* tile);
         void applyForceUp();
         void applyXVelocity(float force);
         void applyXYVelocity(float xForce, float yForce);
-
-    private:
         // Box's size is hardcoded.
         // static const int BOX_WIDTH = 50;
         // static const int BOX_HEIGHT = 50;

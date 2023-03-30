@@ -1,5 +1,7 @@
 #pragma once
 #include <SDL.h>
+class Box;
+#include "Box.h"
 
 //
 class Tile {
@@ -28,8 +30,7 @@ class Tile {
         // Given (x,y) of Box, returns if it is colliding
         // with this Tile.
         bool isColliding(float x, float y);
-
-    private:
+        bool isColliding(Box* box);
         // Box's size is hardcoded.
         // static const int BOX_WIDTH = 50;
         // static const int BOX_HEIGHT = 50;
