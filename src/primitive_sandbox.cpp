@@ -5,10 +5,12 @@
 #include <string> // TODO: look into how this shit works at all
 #include <sstream>
 #include <cmath>
+#include <vector>
 
 // local object stuff
 #include "Box.h" // api for box object stuff
 #include "Text.h"
+#include "Tile.h"
 
 // Defining some global constants + other shit
 // const int WINDOW_WIDTH = 640;
@@ -23,11 +25,15 @@ SDL_Window* mainWindow;
 SDL_Renderer* renderer;
 
 SDL_Texture* boxTexture;
+SDL_Texture* tileTexture;
 
 TTF_Font* globalFont;
 
 SDL_Texture* bgTexture;
 int bgTextureHeight;
+
+Tile* tiles[1];
+
 
 void close(){
     SDL_DestroyTexture( boxTexture );
@@ -49,11 +55,18 @@ bool loadMedia(){
         success = false;
     }
 
+    tileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/tile.png");
+    if(tileTexture == NULL){
+        printf("Couldn't load tile texture. %s", IMG_GetError());
+        success = false;
+    }
+
     bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/clouds.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
     }
+    // store its height for scrolling purposes.
     SDL_QueryTexture(bgTexture, NULL, NULL, NULL, &bgTextureHeight);
 
     // load font into global font
@@ -158,6 +171,8 @@ int main( int argc, char* args[] ){
 
     int offset = 0; // for offsetting the background images.
     int newStart = 0; // indicates where scrolling should begin again.
+
+    tiles[0] = new Tile(renderer, tileTexture, (WINDOW_WIDTH-50)/3, 250);
 
     // While game is running
     while(!quit){
@@ -298,6 +313,8 @@ int main( int argc, char* args[] ){
 
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
+
+        tiles[0]->render(camera.x, camera.y);
 
         //box.render();
         box.render(camera.x, camera.y);

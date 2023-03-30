@@ -11,4 +11,5 @@ src/lazyfoo/
 src/other/
 img/*
 !primitive_sandbox/
+run.*
 
