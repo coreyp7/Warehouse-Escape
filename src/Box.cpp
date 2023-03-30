@@ -148,6 +148,13 @@ void Box::simulatePhysics(float dt, Tile* tile){
                 y += yDistance;
             }
             yvelocity = 0;
+            if(xvelocity > 4){
+                xvelocity += dt * (-X_FRICTION);
+            } else if(xvelocity < -4){
+                xvelocity += dt * X_FRICTION;
+            } else {
+                xvelocity = 0;
+            }
         } else {
             // prioritize x for literally no reason
             if(xvelocity > 0){
@@ -159,9 +166,9 @@ void Box::simulatePhysics(float dt, Tile* tile){
         }
     }
 
-    if(x < 0){
-        x = 0;
-    }
+    // if(x < 0){
+    //     x = 0;
+    // }
 
     // Don't allow box to go outside x min/max bounds.
     if(x > X_MAX_LIMIT){
