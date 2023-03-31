@@ -20,6 +20,8 @@ using namespace std;
 const int WINDOW_WIDTH = 720;
 const int WINDOW_HEIGHT = 480;
 
+const int CAMERA_PADDING = 75;
+
 // FPS Cap when rendering. 60 by default.
 short int fpsCap = 60;
 
@@ -279,25 +281,21 @@ int main( int argc, char* args[] ){
         box.simulatePhysics(dt, tiles);
         
 
-        // We moved the box; now adjust the camera if needed.
-        // If box goes higher than -50 above camera, offset camera higher
-        if(box.getY() < camera.y - 50){
+        // Adjust camera position depending on player pos
+        if(box.getY() < camera.y + CAMERA_PADDING){
             int oldCamY = camera.y;
-            camera.y = box.getY() + 50;
+            camera.y = box.getY() - CAMERA_PADDING;
             offset += fabs(camera.y - oldCamY);
+        } else if(box.y + box.BOX_HEIGHT > camera.y + camera.h - CAMERA_PADDING){
+            // int oldCamY = camera.y;
+            // camera.y = box.y + box.BOX_HEIGHT + CAMERA_PADDING;
+            // offset -= fabs(oldCamY - camera.y);
+            // printf("camera_padding applied");
+            int oldCamY = camera.y;
+            int newBottom = (box.y + box.BOX_HEIGHT) + CAMERA_PADDING;
+            camera.y = newBottom - camera.h;
+            offset -= fabs(oldCamY - camera.y);
         }
-        //TODO: maybe add camera movement down, leaning towards not doing it
-        // even though I want to
-
-        // basic behavior
-        // if(box.getY() < camera.y){
-        //     camera.y = box.getY();
-        // }
-        // Same as current behavior but adjusts camera when box position < camera.y + 50.
-        // Looks worse.
-        // if(box.getY() < camera.y + 50){
-        //     camera.y = box.getY() - 50;
-        // }
 
         //Calculate avg fps
         avgFPS = countedFrames / ( SDL_GetTicks() / 1000.f );
