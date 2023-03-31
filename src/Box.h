@@ -2,6 +2,8 @@
 #include <SDL.h>
 class Tile; // resolves circular dependency
 #include "Tile.h"
+#include <vector>
+using namespace std;
 
 
 /*
@@ -56,6 +58,8 @@ class Box {
 
         void simulatePhysics(float dt);
         void simulatePhysics(float dt, Tile* tile);
+        //void simulatePhysics(float dt, vector<Tile> tiles);
+        void simulatePhysics(float dt, vector<Tile> &tiles);
         void applyForceUp();
         void applyXVelocity(float force);
         void applyXYVelocity(float xForce, float yForce);

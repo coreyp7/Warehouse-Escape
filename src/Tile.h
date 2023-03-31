@@ -8,6 +8,7 @@ class Tile {
     public:
         // Constructor that sets x y cords of the tile in worldspace.
         Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y);
+        Tile();
         ~Tile(); // destructor, cleans up everything for this box.
 
         // Constructor that sets this box's SDL_Texture field "texture"

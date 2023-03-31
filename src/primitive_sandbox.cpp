@@ -7,6 +7,8 @@
 #include <cmath>
 #include <vector>
 
+using namespace std;
+
 // local object stuff
 #include "Box.h" // api for box object stuff
 #include "Text.h"
@@ -32,7 +34,9 @@ TTF_Font* globalFont;
 SDL_Texture* bgTexture;
 int bgTextureHeight;
 
-Tile* tiles[1];
+vector<Tile> tiles;
+
+//Tile* tiles[1];
 
 
 void close(){
@@ -172,7 +176,26 @@ int main( int argc, char* args[] ){
     int offset = 0; // for offsetting the background images.
     int newStart = 0; // indicates where scrolling should begin again.
 
-    tiles[0] = new Tile(renderer, tileTexture, (WINDOW_WIDTH-50)/3, 250);
+    // tiles.push_back(Tile(renderer, tileTexture, (WINDOW_WIDTH-50)/3, 250));
+    tiles.push_back(Tile(renderer, tileTexture, 0, 0));
+
+    tiles.push_back(Tile(renderer, tileTexture, 0, 75));
+    tiles.push_back(Tile(renderer, tileTexture, 0, 75*2));
+    tiles.push_back(Tile(renderer, tileTexture, 0, 75*3));
+    tiles.push_back(Tile(renderer, tileTexture, 0, 75*4));
+    // tiles.push_back(Tile(renderer, tileTexture, 0, 75*5));
+
+    tiles.push_back(Tile(renderer, tileTexture, 75, 75*5));
+    tiles.push_back(Tile(renderer, tileTexture, 75*2, 75*5));
+    tiles.push_back(Tile(renderer, tileTexture, 75*3, 75*5));
+    tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
+    tiles.push_back(Tile(renderer, tileTexture, 75*5, 75*5));
+
+    tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
+    tiles.push_back(Tile(renderer, tileTexture, 75*8, 75*3));
+
+    tiles.push_back(Tile(renderer, tileTexture, 75*6, 75*3));
+
 
     // While game is running
     while(!quit){
@@ -253,7 +276,8 @@ int main( int argc, char* args[] ){
         ///////////////////////////
 
         dt = (SDL_GetTicks() - box.lastPhysicsUpdate) / 1000.0f;
-        box.simulatePhysics(dt, tiles[0]);
+        box.simulatePhysics(dt, tiles);
+        
 
         // We moved the box; now adjust the camera if needed.
         // If box goes higher than -50 above camera, offset camera higher
@@ -314,7 +338,10 @@ int main( int argc, char* args[] ){
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
 
-        tiles[0]->render(camera.x, camera.y);
+        //tiles[0]->render(camera.x, camera.y);
+        for(int i = 0; i<tiles.size(); i++){
+            tiles[i].render(camera.x, camera.y);
+        }
 
         //box.render();
         box.render(camera.x, camera.y);

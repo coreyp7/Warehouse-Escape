@@ -1,6 +1,14 @@
 #include "Tile.h"
 #include <cmath>
 
+Tile::Tile(){
+
+}
+
+Tile::~Tile(){
+    
+}
+
 Tile::Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y){
     this->renderer = renderer;
     this->texture = texture;
