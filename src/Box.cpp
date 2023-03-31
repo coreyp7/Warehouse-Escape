@@ -18,39 +18,6 @@ Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float
 
 }
 
-void Box::simulatePhysics(float dt){
-    yvelocity += dt * GRAVITY;
-    y += yvelocity * dt;
-    x += xvelocity * dt;
-
-    if(x < 0){
-        x = 0;
-    }
-
-    // Don't allow box to go outside x min/max bounds.
-    if(x > X_MAX_LIMIT){
-        x = X_MAX_LIMIT;
-    }
-    else if(x < X_MIN_LIMIT){
-        x = X_MIN_LIMIT;
-    }
-
-    // CHANGE: this should happen on collision detection not hardcoded
-    if(y > 400.0){ // onground
-        y = 400.0;
-        yvelocity = 0;
-        if(xvelocity > 4){
-            xvelocity += dt * (-X_FRICTION);
-        } else if(xvelocity < -4){
-            xvelocity += dt * X_FRICTION;
-        } else {
-            xvelocity = 0;
-        }
-        //xvelocity = 0; // stop box on land
-    }
-
-    lastPhysicsUpdate = SDL_GetTicks();
-}
 
 void Box::applyForceUp(){
     yvelocity = CLICK_VELOCITY;
@@ -105,94 +72,6 @@ float Box::getYVelocity(){
 
 float Box::getXVelocity(){
     return xvelocity;
-}
-
-void Box::simulatePhysics(float dt, Tile* tile){
-    yvelocity += dt * GRAVITY;
-
-    int xold = x;
-    int yold = y;
-
-    y += yvelocity * dt;
-    x += xvelocity * dt;
-
-    if(tile->isColliding(this)){
-        //printf("Colliding.");
-
-        float xDistance, yDistance;
-        if(x < tile->x){
-            xDistance = ((x + BOX_WIDTH) - tile->x);
-        } else { // x >= tile->x
-            xDistance = ((tile->x + tile->TILE_WIDTH) - x);
-        }
-
-        if(y < tile->y){
-            yDistance = ((y + BOX_HEIGHT) - tile->y);
-        } else { // y >= tile->y
-            yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
-        }
-
-        if(xDistance < yDistance){
-            // fix x-axis of box only
-            if(xvelocity > 0){
-                x -= xDistance;
-            } else {
-                x += xDistance;
-            }
-            xvelocity = 0;
-        } else if(xDistance > yDistance) {
-            // fix y-axis of box only
-            if(yvelocity > 0){
-                y -= yDistance;
-            } else {
-                y += yDistance;
-            }
-            yvelocity = 0;
-            if(xvelocity > 4){
-                xvelocity += dt * (-X_FRICTION);
-            } else if(xvelocity < -4){
-                xvelocity += dt * X_FRICTION;
-            } else {
-                xvelocity = 0;
-            }
-        } else {
-            // prioritize x for literally no reason
-            if(xvelocity > 0){
-                x -= xDistance;
-            } else {
-                x += xDistance;
-            }
-            xvelocity = 0;
-        }
-    }
-
-    // if(x < 0){
-    //     x = 0;
-    // }
-
-    // Don't allow box to go outside x min/max bounds.
-    if(x > X_MAX_LIMIT){
-        x = X_MAX_LIMIT;
-    }
-    else if(x < X_MIN_LIMIT){
-        x = X_MIN_LIMIT;
-    }
-
-    // CHANGE: this should happen on collision detection not hardcoded
-    if(y > 400.0){ // onground
-        y = 400.0;
-        yvelocity = 0;
-        if(xvelocity > 4){
-            xvelocity += dt * (-X_FRICTION);
-        } else if(xvelocity < -4){
-            xvelocity += dt * X_FRICTION;
-        } else {
-            xvelocity = 0;
-        }
-        //xvelocity = 0; // stop box on land
-    }
-
-    lastPhysicsUpdate = SDL_GetTicks();
 }
 
 void Box::simulatePhysics(float dt, vector<Tile> &tiles){
@@ -261,26 +140,26 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
     }
 
     // Don't allow box to go outside x min/max bounds.
-    if(x > X_MAX_LIMIT){
-        x = X_MAX_LIMIT;
-    }
-    else if(x < X_MIN_LIMIT){
-        x = X_MIN_LIMIT;
-    }
+    // if(x > X_MAX_LIMIT){
+    //     x = X_MAX_LIMIT;
+    // }
+    // else if(x < X_MIN_LIMIT){
+    //     x = X_MIN_LIMIT;
+    // }
 
     // CHANGE: this should happen on collision detection not hardcoded
-    if(y > 400.0){ // onground
-        y = 400.0;
-        yvelocity = 0;
-        if(xvelocity > 4){
-            xvelocity += dt * (-X_FRICTION);
-        } else if(xvelocity < -4){
-            xvelocity += dt * X_FRICTION;
-        } else {
-            xvelocity = 0;
-        }
-        //xvelocity = 0; // stop box on land
-    }
+    // if(y > 400.0){ // onground
+    //     y = 400.0;
+    //     yvelocity = 0;
+    //     if(xvelocity > 4){
+    //         xvelocity += dt * (-X_FRICTION);
+    //     } else if(xvelocity < -4){
+    //         xvelocity += dt * X_FRICTION;
+    //     } else {
+    //         xvelocity = 0;
+    //     }
+    //     //xvelocity = 0; // stop box on land
+    // }
 
     lastPhysicsUpdate = SDL_GetTicks();
 }

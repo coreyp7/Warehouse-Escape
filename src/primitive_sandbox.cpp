@@ -67,7 +67,7 @@ bool loadMedia(){
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/clouds.png");
+    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/clouds2.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
@@ -296,6 +296,13 @@ int main( int argc, char* args[] ){
             int newBottom = (box.y + box.BOX_HEIGHT) + CAMERA_PADDING;
             camera.y = newBottom - camera.h;
             offset -= fabs(oldCamY - camera.y);
+        }
+
+        if(box.x + box.BOX_WIDTH > (camera.x + camera.w) - CAMERA_PADDING){ // right side
+            int newRight = (box.x + box.BOX_WIDTH) + CAMERA_PADDING;
+            camera.x = newRight - camera.w;
+        } else if(box.x < (camera.x + CAMERA_PADDING)){ // left side
+            camera.x = box.x - CAMERA_PADDING;
         }
 
         //Calculate avg fps

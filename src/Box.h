@@ -75,8 +75,8 @@ class Box {
         static constexpr float X_FRICTION = 700.0f;
 
         // CHANGE: pass value from main to allow for multiple screen sizes.
-        static const int X_MAX_LIMIT = 565; 
-        static const int X_MIN_LIMIT = 20;
+        //static const int X_MAX_LIMIT = 565; 
+        //static const int X_MIN_LIMIT = 20;
 
         // "hardware texture" for this box. Obtained from constructor.
         SDL_Texture* texture;
