@@ -168,6 +168,7 @@ int main( int argc, char* args[] ){
     Text boxText = Text(renderer, globalFont, textColor);
     Text cameraText = Text(renderer, globalFont, textColor);
     Text velocityText = Text(renderer, globalFont, textColor);
+    Text offsetText = Text(renderer, globalFont, textColor);
 
     Box box = Box(renderer, boxTexture, 
     (WINDOW_WIDTH-50)/2, 
@@ -322,7 +323,26 @@ int main( int argc, char* args[] ){
             offset = 0;
             newStart = camera.y;
             //printf("camera.y + (offset*2):%d, newStart:%d", camera.y + (offset*2), newStart);
+        } else if(offset < -bgTextureHeight){
+            offset = 0;
+            newStart = camera.y;
         }
+
+
+        if(offset >= 0){
+            SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
+            SDL_Rect bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h };
+
+            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);      
+        }else {
+            SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
+            SDL_Rect bg2 = {0, bg1.y + bgTextureHeight, camera.w, camera.h };
+
+            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);      
+        }
+
 
         // oldtodo: recall the confusion of this working.
         // printf it and camera.y + (offset*2) is the same value as newStart.
@@ -336,7 +356,6 @@ int main( int argc, char* args[] ){
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
 
-        //tiles[0]->render(camera.x, camera.y);
         for(int i = 0; i<tiles.size(); i++){
             tiles[i].render(camera.x, camera.y);
         }
@@ -361,6 +380,11 @@ int main( int argc, char* args[] ){
         oss3 << "velocity: (" << box.getXVelocity() << ", " << box.getYVelocity() << ")";
         velocityText.changeText(oss3.str());
         velocityText.render(WINDOW_WIDTH - velocityText.getWidth(), boxText.getHeight() + cameraText.getHeight());
+        std::ostringstream oss4;
+        oss4 << "offset:" << offset;
+        offsetText.changeText(oss4.str());
+        offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
+
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop
