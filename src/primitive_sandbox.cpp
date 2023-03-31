@@ -35,6 +35,7 @@ TTF_Font* globalFont;
 
 SDL_Texture* bgTexture;
 int bgTextureHeight;
+int bgTextureWidth;
 
 vector<Tile> tiles;
 
@@ -73,7 +74,7 @@ bool loadMedia(){
         success = false;
     }
     // store its height for scrolling purposes.
-    SDL_QueryTexture(bgTexture, NULL, NULL, NULL, &bgTextureHeight);
+    SDL_QueryTexture(bgTexture, NULL, NULL, &bgTextureWidth, &bgTextureHeight);
 
     // load font into global font
     globalFont = TTF_OpenFont("img/primitive_sandbox/Lato-Black.ttf", 26);
@@ -176,28 +177,38 @@ int main( int argc, char* args[] ){
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    int offset = 0; // for offsetting the background images.
-    int newStart = 0; // indicates where scrolling should begin again.
+    int offsetY = 0; // for offsetting the background images.
+    int offsetX = 0;
+    int newStartY = 0; // indicates where scrolling should begin again.
+    int newStartX = 0;
 
     // tiles.push_back(Tile(renderer, tileTexture, (WINDOW_WIDTH-50)/3, 250));
     tiles.push_back(Tile(renderer, tileTexture, 0, 0));
 
+    // left wall
     tiles.push_back(Tile(renderer, tileTexture, 0, 75));
     tiles.push_back(Tile(renderer, tileTexture, 0, 75*2));
     tiles.push_back(Tile(renderer, tileTexture, 0, 75*3));
     tiles.push_back(Tile(renderer, tileTexture, 0, 75*4));
-    // tiles.push_back(Tile(renderer, tileTexture, 0, 75*5));
 
-    tiles.push_back(Tile(renderer, tileTexture, 75, 75*5));
-    tiles.push_back(Tile(renderer, tileTexture, 75*2, 75*5));
-    tiles.push_back(Tile(renderer, tileTexture, 75*3, 75*5));
-    tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
-    tiles.push_back(Tile(renderer, tileTexture, 75*5, 75*5));
+    for(int i = 0; i < 40; i++){
+        tiles.push_back(Tile(renderer, tileTexture, 75*i, 75*5));
+    }
+    // tiles.push_back(Tile(renderer, tileTexture, 75, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*2, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*3, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*5, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*6, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*7, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*8, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*9, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*10, 75*5));
 
-    tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
-    tiles.push_back(Tile(renderer, tileTexture, 75*8, 75*3));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*8, 75*3));
 
-    tiles.push_back(Tile(renderer, tileTexture, 75*6, 75*3));
+    // tiles.push_back(Tile(renderer, tileTexture, 75*6, 75*3));
 
 
     // While game is running
@@ -286,23 +297,23 @@ int main( int argc, char* args[] ){
         if(box.getY() < camera.y + CAMERA_PADDING){
             int oldCamY = camera.y;
             camera.y = box.getY() - CAMERA_PADDING;
-            offset += fabs(camera.y - oldCamY);
+            offsetY += fabs(camera.y - oldCamY);
         } else if(box.y + box.BOX_HEIGHT > camera.y + camera.h - CAMERA_PADDING){
-            // int oldCamY = camera.y;
-            // camera.y = box.y + box.BOX_HEIGHT + CAMERA_PADDING;
-            // offset -= fabs(oldCamY - camera.y);
-            // printf("camera_padding applied");
             int oldCamY = camera.y;
             int newBottom = (box.y + box.BOX_HEIGHT) + CAMERA_PADDING;
             camera.y = newBottom - camera.h;
-            offset -= fabs(oldCamY - camera.y);
+            offsetY -= fabs(oldCamY - camera.y);
         }
 
         if(box.x + box.BOX_WIDTH > (camera.x + camera.w) - CAMERA_PADDING){ // right side
+            int oldCamX = camera.x;
             int newRight = (box.x + box.BOX_WIDTH) + CAMERA_PADDING;
             camera.x = newRight - camera.w;
+            offsetX += fabs(camera.x - oldCamX);
         } else if(box.x < (camera.x + CAMERA_PADDING)){ // left side
+            int oldCamX = camera.x;
             camera.x = box.x - CAMERA_PADDING;
+            offsetX -= fabs(oldCamX - camera.x);
         }
 
         //Calculate avg fps
@@ -323,30 +334,74 @@ int main( int argc, char* args[] ){
         SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear(renderer);
 
-        if(offset > bgTextureHeight){
+        if(offsetY > bgTextureHeight){
             // When the first bg goes offscreen (offset > bgTextureHeight), 
             // the offset is restarted and the "newStart" (which indicates the new top of bg1) 
             // is set to the camera's y position.
-            offset = 0;
-            newStart = camera.y;
+            offsetY = 0;
+            newStartY = camera.y;
             //printf("camera.y + (offset*2):%d, newStart:%d", camera.y + (offset*2), newStart);
-        } else if(offset < -bgTextureHeight){
-            offset = 0;
-            newStart = camera.y;
+        } else if(offsetY < -bgTextureHeight){
+            offsetY = 0;
+            newStartY = camera.y;
         }
 
-        SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
-        SDL_Rect bg2;
-
-        // Put bg2 above/below bg1 depending on offset
-        if(offset >= 0){
-            bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h }; 
-        }else {
-            bg2 = {0, bg1.y + bgTextureHeight, camera.w, camera.h };    
+        if(offsetX > camera.w){
+            offsetX = 0;
+            newStartX = camera.x;
+        } else if(offsetX < -camera.w){
+            offsetX = 0;
+            newStartX = camera.x;
         }
+
+        
+        /**
+         * bg1-4 are four duplicates of the background image.
+         * Depending on the direction the player is moving, bg2/4 will 
+         * display on the left/right of bg1/3.
+         * Complicated but works.
+         * Currently works strictly with camera width/height, which could be changed
+         * to just be the w/h of the image loaded.
+         */
+        SDL_Rect bg1 = {camera.x - (offsetX*2) - newStartX, 
+            camera.y + (offsetY*2) - newStartY, 
+            camera.w, 
+            camera.h };
+        SDL_Rect bg2 = {camera.x - (offsetX*2) - newStartX, 0, camera.w, camera.h};
+
+        SDL_Rect bg3 = {0, bg1.y, camera.w, camera.h };
+
+        if(offsetX >= 0){
+            bg3.x = bg1.x + camera.w;
+        } else {
+            bg3.x = bg1.x - camera.w;
+        }
+
+        SDL_Rect bg4 = {bg3.x, bg3.y, camera.w, camera.h};
+
+        if(offsetY >= 0){
+            bg2.y = bg1.y - bgTextureHeight;
+            bg4.y = bg1.y - camera.h;
+        } else {
+            bg2.y = bg1.y + bgTextureHeight;
+            bg4.y = bg1.y + camera.h;
+        }
+
+        // if(offsetX >= 0){
+        //     bg2.x = bg1.x - bgTextureWidth;
+        // } else {
+        //     bg2.x = bg1.x + bgTextureWidth;
+        // }
+
+        //SDL_Rect bg3 = {bg1.x + bgTextureWidth, camera.w, camera.h };
+
+        //SDL_Rect bg = {, camera.y + (offsetY*2) - newStart, camera.w, camera.h };
 
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg3, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg4, 0, NULL, SDL_FLIP_NONE);
+
 
         // oldtodo: recall the confusion of this working.
         // printf it and camera.y + (offset*2) is the same value as newStart.
@@ -381,7 +436,7 @@ int main( int argc, char* args[] ){
         velocityText.changeText(oss3.str());
         velocityText.render(WINDOW_WIDTH - velocityText.getWidth(), boxText.getHeight() + cameraText.getHeight());
         std::ostringstream oss4;
-        oss4 << "offset:" << offset;
+        oss4 << "offsetY:" << offsetY << ", offsetX:" << offsetX;
         offsetText.changeText(oss4.str());
         offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
 
