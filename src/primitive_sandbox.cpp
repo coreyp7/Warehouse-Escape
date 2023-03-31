@@ -328,21 +328,18 @@ int main( int argc, char* args[] ){
             newStart = camera.y;
         }
 
+        SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
+        SDL_Rect bg2;
 
+        // Put bg2 above/below bg1 depending on offset
         if(offset >= 0){
-            SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
-            SDL_Rect bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h };
-
-            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
-            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);      
+            bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h }; 
         }else {
-            SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
-            SDL_Rect bg2 = {0, bg1.y + bgTextureHeight, camera.w, camera.h };
-
-            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
-            SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);      
+            bg2 = {0, bg1.y + bgTextureHeight, camera.w, camera.h };    
         }
 
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
 
         // oldtodo: recall the confusion of this working.
         // printf it and camera.y + (offset*2) is the same value as newStart.
@@ -350,11 +347,7 @@ int main( int argc, char* args[] ){
         // while troubleshooting but was astounded that a solution actually worked for once.
         // Nice job.
         // TODO: initialize these variables outside while loop so you're not creating it everytime.
-        SDL_Rect bg1 = {0, camera.y + (offset*2) - newStart, camera.w, camera.h };
-        SDL_Rect bg2 = {0, bg1.y - bgTextureHeight, camera.w, camera.h };
-
-        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
+        
 
         for(int i = 0; i<tiles.size(); i++){
             tiles[i].render(camera.x, camera.y);
