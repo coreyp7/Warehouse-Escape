@@ -68,7 +68,7 @@ bool loadMedia(){
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/clouds2.png");
+    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/halodoom.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
@@ -346,10 +346,10 @@ int main( int argc, char* args[] ){
             newStartY = camera.y;
         }
 
-        if(offsetX > camera.w){
+        if(offsetX > bgTextureWidth){
             offsetX = 0;
             newStartX = camera.x;
-        } else if(offsetX < -camera.w){
+        } else if(offsetX < -bgTextureWidth){
             offsetX = 0;
             newStartX = camera.x;
         }
@@ -365,26 +365,25 @@ int main( int argc, char* args[] ){
          */
         SDL_Rect bg1 = {camera.x - (offsetX*2) - newStartX, 
             camera.y + (offsetY*2) - newStartY, 
-            camera.w, 
-            camera.h };
-        SDL_Rect bg2 = {camera.x - (offsetX*2) - newStartX, 0, camera.w, camera.h};
-
-        SDL_Rect bg3 = {0, bg1.y, camera.w, camera.h };
+            bgTextureWidth, 
+            bgTextureHeight };
+        SDL_Rect bg2 = {camera.x - (offsetX*2) - newStartX, 0, bgTextureWidth, bgTextureHeight};
+        SDL_Rect bg3 = {0, bg1.y, bgTextureWidth, bgTextureHeight };
 
         if(offsetX >= 0){
-            bg3.x = bg1.x + camera.w;
+            bg3.x = bg1.x + bgTextureWidth;
         } else {
-            bg3.x = bg1.x - camera.w;
+            bg3.x = bg1.x - bgTextureWidth;
         }
 
-        SDL_Rect bg4 = {bg3.x, bg3.y, camera.w, camera.h};
+        SDL_Rect bg4 = {bg3.x, bg3.y, bgTextureWidth, bgTextureHeight};
 
         if(offsetY >= 0){
             bg2.y = bg1.y - bgTextureHeight;
-            bg4.y = bg1.y - camera.h;
+            bg4.y = bg1.y - bgTextureHeight;
         } else {
             bg2.y = bg1.y + bgTextureHeight;
-            bg4.y = bg1.y + camera.h;
+            bg4.y = bg1.y + bgTextureHeight;
         }
 
         // if(offsetX >= 0){
