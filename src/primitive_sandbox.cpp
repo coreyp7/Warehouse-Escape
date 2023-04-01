@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cmath>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -134,6 +135,38 @@ int init(){
     return 0;
 }
 
+bool loadLevel(string path){
+    int x = 0, y = 0; // tile offsets
+
+    std::ifstream map(path);
+
+    if(map.fail()){
+        printf("Unable to load map 1.");
+    } else {
+        for(int i=0; i<40; i++){
+            int type = -1;
+
+            map >> type;
+
+            if(map.fail()){
+                printf("Unable to load map 2.");
+            }
+
+            if(type == 1){
+                tiles.push_back(Tile(renderer, tileTexture, x, y));
+            }
+
+            x += 75;
+
+            if(x/75 > (9)){
+                x = 0;
+                y -= 75;
+            }
+        }
+    }
+
+}
+
 int main( int argc, char* args[] ){
 
     int initValue = init();
@@ -171,9 +204,11 @@ int main( int argc, char* args[] ){
     Text velocityText = Text(renderer, globalFont, textColor);
     Text offsetText = Text(renderer, globalFont, textColor);
 
-    Box box = Box(renderer, boxTexture, 
-    (WINDOW_WIDTH-50)/2, 
-    0);
+    // Box box = Box(renderer, boxTexture, 
+    // (WINDOW_WIDTH-50)/2, 
+    // 0);
+
+    Box box = Box(renderer, boxTexture, 0, -550);
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
@@ -182,34 +217,11 @@ int main( int argc, char* args[] ){
     int newStartY = 0; // indicates where scrolling should begin again.
     int newStartX = 0;
 
-    // tiles.push_back(Tile(renderer, tileTexture, (WINDOW_WIDTH-50)/3, 250));
-    tiles.push_back(Tile(renderer, tileTexture, 0, 0));
+    // Load file
 
-    // left wall
-    tiles.push_back(Tile(renderer, tileTexture, 0, 75));
-    tiles.push_back(Tile(renderer, tileTexture, 0, 75*2));
-    tiles.push_back(Tile(renderer, tileTexture, 0, 75*3));
-    tiles.push_back(Tile(renderer, tileTexture, 0, 75*4));
+    loadLevel("levels/01.txt");
 
-    for(int i = 0; i < 40; i++){
-        tiles.push_back(Tile(renderer, tileTexture, 75*i, 75*5));
-    }
-    // tiles.push_back(Tile(renderer, tileTexture, 75, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*2, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*3, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*5, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*6, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*7, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*8, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*9, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*10, 75*5));
-
-    // tiles.push_back(Tile(renderer, tileTexture, 75*4, 75*5));
-    // tiles.push_back(Tile(renderer, tileTexture, 75*8, 75*3));
-
-    // tiles.push_back(Tile(renderer, tileTexture, 75*6, 75*3));
-
+    // Done loading file
 
     // While game is running
     while(!quit){
