@@ -40,6 +40,8 @@ int bgTextureWidth;
 
 vector<Tile> tiles;
 
+int playerStartX, playerStartY;
+
 //Tile* tiles[1];
 
 
@@ -143,7 +145,7 @@ bool loadLevel(string path){
     if(map.fail()){
         printf("Unable to load map 1.");
     } else {
-        for(int i=0; i<40; i++){
+        for(int i=0; i<100; i++){
             int type = -1;
 
             map >> type;
@@ -154,13 +156,16 @@ bool loadLevel(string path){
 
             if(type == 1){
                 tiles.push_back(Tile(renderer, tileTexture, x, y));
+            } else if(type == 3){
+                playerStartX = x;
+                playerStartY = y;
             }
 
             x += 75;
 
-            if(x/75 > (9)){
+            if(x/75 > (9)){ // TODO: get from filename
                 x = 0;
-                y -= 75;
+                y += 75;
             }
         }
     }
@@ -208,7 +213,9 @@ int main( int argc, char* args[] ){
     // (WINDOW_WIDTH-50)/2, 
     // 0);
 
-    Box box = Box(renderer, boxTexture, 0, -550);
+    loadLevel("levels/01.txt");
+
+    Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
@@ -216,12 +223,6 @@ int main( int argc, char* args[] ){
     int offsetX = 0;
     int newStartY = 0; // indicates where scrolling should begin again.
     int newStartX = 0;
-
-    // Load file
-
-    loadLevel("levels/01.txt");
-
-    // Done loading file
 
     // While game is running
     while(!quit){
