@@ -42,6 +42,9 @@ vector<Tile> tiles;
 
 int playerStartX, playerStartY;
 
+vector<string> levels;
+int currentLevel = 0;
+
 //Tile* tiles[1];
 
 
@@ -134,18 +137,25 @@ int init(){
         return -6;
     }
 
+    levels.push_back("01_20_10");
+    levels.push_back("02_05_05");
+
+
     return 0;
 }
 
-bool loadLevel(string path){
+bool loadLevel(string filename){
     int x = 0, y = 0; // tile offsets
 
-    std::ifstream map(path);
+    std::ifstream map("levels/"+filename+".level");
+    int width = stoi(filename.substr(3, 2));
+    int length = stoi(filename.substr(6, 2));
+    printf("width:%i, length:%i", width, length);
 
     if(map.fail()){
         printf("Unable to load map 1.");
     } else {
-        for(int i=0; i<100; i++){
+        for(int i=0; i<(width*length); i++){
             int type = -1;
 
             map >> type;
@@ -163,7 +173,7 @@ bool loadLevel(string path){
 
             x += 75;
 
-            if(x/75 > (9)){ // TODO: get from filename
+            if(x/75 > (width-1)){ // TODO: get from filename
                 x = 0;
                 y += 75;
             }
@@ -213,7 +223,9 @@ int main( int argc, char* args[] ){
     // (WINDOW_WIDTH-50)/2, 
     // 0);
 
-    loadLevel("levels/01.txt");
+    //loadLevel("levels/01.txt");
+    //printf("levels[0]: %s", levels[0]);
+    loadLevel(levels[1]);
 
     Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
 
