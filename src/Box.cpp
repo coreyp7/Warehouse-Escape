@@ -89,52 +89,55 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
         tile = &tiles[i];
 
         if(tile->isColliding(this)){
-        //printf("Colliding.");
-
-            float xDistance, yDistance;
-            if(x < tile->x){
-                xDistance = ((x + BOX_WIDTH) - tile->x);
-            } else { // x >= tile->x
-                xDistance = ((tile->x + tile->TILE_WIDTH) - x);
-            }
-
-            if(y < tile->y){
-                yDistance = ((y + BOX_HEIGHT) - tile->y);
-            } else { // y >= tile->y
-                yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
-            }
-
-            if(xDistance < yDistance){
-                // fix x-axis of box only
-                if(xvelocity > 0){
-                    x -= xDistance;
-                } else {
-                    x += xDistance;
+            if(tile->finish){
+                printf("Finish reached.");
+                yvelocity = -1500;
+            } else {
+                float xDistance, yDistance;
+                if(x < tile->x){
+                    xDistance = ((x + BOX_WIDTH) - tile->x);
+                } else { // x >= tile->x
+                    xDistance = ((tile->x + tile->TILE_WIDTH) - x);
                 }
-                xvelocity = 0;
-            } else if(xDistance > yDistance) {
-                // fix y-axis of box only
-                if(yvelocity > 0){
-                    y -= yDistance;
-                } else {
-                    y += yDistance;
+
+                if(y < tile->y){
+                    yDistance = ((y + BOX_HEIGHT) - tile->y);
+                } else { // y >= tile->y
+                    yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
                 }
-                yvelocity = 0;
-                if(xvelocity > 4){
-                    xvelocity += dt * (-X_FRICTION);
-                } else if(xvelocity < -4){
-                    xvelocity += dt * X_FRICTION;
+
+                if(xDistance < yDistance){
+                    // fix x-axis of box only
+                    if(xvelocity > 0){
+                        x -= xDistance;
+                    } else {
+                        x += xDistance;
+                    }
+                    xvelocity = 0;
+                } else if(xDistance > yDistance) {
+                    // fix y-axis of box only
+                    if(yvelocity > 0){
+                        y -= yDistance;
+                    } else {
+                        y += yDistance;
+                    }
+                    yvelocity = 0;
+                    if(xvelocity > 4){
+                        xvelocity += dt * (-X_FRICTION);
+                    } else if(xvelocity < -4){
+                        xvelocity += dt * X_FRICTION;
+                    } else {
+                        xvelocity = 0;
+                    }
                 } else {
+                    // prioritize x for literally no reason
+                    if(xvelocity > 0){
+                        x -= xDistance;
+                    } else {
+                        x += xDistance;
+                    }
                     xvelocity = 0;
                 }
-            } else {
-                // prioritize x for literally no reason
-                if(xvelocity > 0){
-                    x -= xDistance;
-                } else {
-                    x += xDistance;
-                }
-                xvelocity = 0;
             }
         }
     }

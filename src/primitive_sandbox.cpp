@@ -23,6 +23,11 @@ const int WINDOW_HEIGHT = 480;
 
 const int CAMERA_PADDING = 75;
 
+const int EMPTY_TILE = 0;
+const int GROUND_TILE = 1;
+const int END_TILE = 2;
+const int SPAWN_TILE = 3;
+
 // FPS Cap when rendering. 60 by default.
 short int fpsCap = 60;
 
@@ -31,6 +36,7 @@ SDL_Renderer* renderer;
 
 SDL_Texture* boxTexture;
 SDL_Texture* tileTexture;
+SDL_Texture* endTileTexture;
 
 TTF_Font* globalFont;
 
@@ -74,10 +80,15 @@ bool loadMedia(){
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/halodoom.png");
+    endTileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/end.png");
+    if(tileTexture == NULL){
+        printf("Couldn't load tile texture. %s", IMG_GetError());
+        success = false;
+    }
+
+    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/wall.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
-        success = false;
     }
     // store its height for scrolling purposes.
     SDL_QueryTexture(bgTexture, NULL, NULL, &bgTextureWidth, &bgTextureHeight);
@@ -164,12 +175,19 @@ bool loadLevel(string filename){
                 printf("Unable to load map 2.");
             }
 
-            if(type == 1){
+            if(type == EMPTY_TILE){
+                // do nothing
+            } 
+            else if(type == GROUND_TILE){
                 tiles.push_back(Tile(renderer, tileTexture, x, y));
-            } else if(type == 3){
+            } 
+            else if(type == END_TILE){
+                tiles.push_back(Tile(renderer, endTileTexture, x, y, true));
+            }
+            else if(type == SPAWN_TILE){
                 playerStartX = x;
                 playerStartY = y;
-            }
+            } 
 
             x += 75;
 

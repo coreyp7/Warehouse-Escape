@@ -7,7 +7,7 @@ class Box;
 class Tile {
     public:
         // Constructor that sets x y cords of the tile in worldspace.
-        Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y);
+        Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y, bool finish = false);
         Tile();
         ~Tile(); // destructor, cleans up everything for this box.
 
@@ -45,4 +45,6 @@ class Tile {
 
         SDL_Rect rect;
         SDL_Renderer* renderer;
+
+        bool finish;
 };

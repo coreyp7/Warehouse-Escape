@@ -9,11 +9,12 @@ Tile::~Tile(){
     
 }
 
-Tile::Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y){
+Tile::Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y, bool finish){
     this->renderer = renderer;
     this->texture = texture;
     this->x = x;
     this->y = y;
+    this->finish = finish;
 }
 
 // render tile relative to camera.
