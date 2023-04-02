@@ -59,6 +59,8 @@ int levelCompleted = false;
 Uint32 timeOfStart = 0; // start of timer in level
 int timeOfFinish = -1; // time when the user finished this level
 
+bool gameComplete = false;
+
 //Tile* tiles[1];
 
 
@@ -88,7 +90,7 @@ bool loadMedia(){
         success = false;
     }
 
-    endTileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/end.png");
+    endTileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/end2.png");
     if(tileTexture == NULL){
         printf("Couldn't load tile texture. %s", IMG_GetError());
         success = false;
@@ -227,7 +229,7 @@ string getTimeFormatted(){
     }
 
     string msString = to_string(ms);
-    
+
     // Prevent 'std::out_of_range' happening.
     // basic_string::substr: __pos (which is 4294967295) > this->size() (which is 1)
     if(msString.size() > 2){
@@ -275,6 +277,10 @@ int main( int argc, char* args[] ){
     Text offsetText = Text(renderer, globalFont, textColor);
 
     Text timerText = Text(renderer, globalFont, textColor);
+
+    Text levelBeatenText = Text(renderer, globalFont, textColor);
+    Text gameDoneText = Text(renderer, globalFont, textColor);
+    Text gameDoneText2 = Text(renderer, globalFont, textColor);
 
     // Box box = Box(renderer, boxTexture, 
     // (WINDOW_WIDTH-50)/2, 
@@ -380,43 +386,58 @@ int main( int argc, char* args[] ){
         box.simulatePhysics(dt, *currentLevelTiles);
 
         if(box.completedLevel){
-            currentLevelIndex++; // go to next level
-            if(currentLevelIndex >= NUMBER_OF_LEVELS){
-                close();
-                return 0;
+            if(timeOfFinish == -1){
+                timeOfFinish = SDL_GetTicks();
+                camera.y -= 100;
+            } else {
+
+                if(timeOfFinish + 2000 < SDL_GetTicks()){
+
+                    if(! (currentLevelIndex+1 >= NUMBER_OF_LEVELS)){
+                        currentLevelIndex++; // go to next level
+                        currentLevelTiles = &levelTilesets[currentLevelIndex];
+                        box.x = levelSpawnPoints[currentLevelIndex].first;
+                        box.y = levelSpawnPoints[currentLevelIndex].second;
+                        box.xvelocity = 0;
+                        box.yvelocity = 0;
+                        box.completedLevel = false;
+                        timeOfStart = SDL_GetTicks();
+                        timeOfFinish = -1;
+                    } else {
+                        // TODO: show text that this is the end of the game
+                        // and thanks for playing.
+                        levelBeatenText.changeText("That's all the levels.");
+                        gameDoneText.changeText("Thank you, I appreciate you playing this.");
+                        gameDoneText2.changeText("(you can press 'p' key to see debug info for fun)");
+
+                        gameComplete = true;
+                    }
+                }
             }
 
-            currentLevelTiles = &levelTilesets[currentLevelIndex];
-            box.x = levelSpawnPoints[currentLevelIndex].first;
-            box.y = levelSpawnPoints[currentLevelIndex].second;
-            box.xvelocity = 0;
-            box.yvelocity = 0;
-            box.completedLevel = false;
-            timeOfStart = SDL_GetTicks();
-        }
-        
+        } else {
+            // Adjust camera position depending on player pos
+            if(box.getY() < camera.y + CAMERA_PADDING){
+                int oldCamY = camera.y;
+                camera.y = box.getY() - CAMERA_PADDING;
+                offsetY += fabs(camera.y - oldCamY);
+            } else if(box.y + box.BOX_HEIGHT > camera.y + camera.h - CAMERA_PADDING){
+                int oldCamY = camera.y;
+                int newBottom = (box.y + box.BOX_HEIGHT) + CAMERA_PADDING;
+                camera.y = newBottom - camera.h;
+                offsetY -= fabs(oldCamY - camera.y);
+            }
 
-        // Adjust camera position depending on player pos
-        if(box.getY() < camera.y + CAMERA_PADDING){
-            int oldCamY = camera.y;
-            camera.y = box.getY() - CAMERA_PADDING;
-            offsetY += fabs(camera.y - oldCamY);
-        } else if(box.y + box.BOX_HEIGHT > camera.y + camera.h - CAMERA_PADDING){
-            int oldCamY = camera.y;
-            int newBottom = (box.y + box.BOX_HEIGHT) + CAMERA_PADDING;
-            camera.y = newBottom - camera.h;
-            offsetY -= fabs(oldCamY - camera.y);
-        }
-
-        if(box.x + box.BOX_WIDTH > (camera.x + camera.w) - CAMERA_PADDING){ // right side
-            int oldCamX = camera.x;
-            int newRight = (box.x + box.BOX_WIDTH) + CAMERA_PADDING;
-            camera.x = newRight - camera.w;
-            offsetX += fabs(camera.x - oldCamX);
-        } else if(box.x < (camera.x + CAMERA_PADDING)){ // left side
-            int oldCamX = camera.x;
-            camera.x = box.x - CAMERA_PADDING;
-            offsetX -= fabs(oldCamX - camera.x);
+            if(box.x + box.BOX_WIDTH > (camera.x + camera.w) - CAMERA_PADDING){ // right side
+                int oldCamX = camera.x;
+                int newRight = (box.x + box.BOX_WIDTH) + CAMERA_PADDING;
+                camera.x = newRight - camera.w;
+                offsetX += fabs(camera.x - oldCamX);
+            } else if(box.x < (camera.x + CAMERA_PADDING)){ // left side
+                int oldCamX = camera.x;
+                camera.x = box.x - CAMERA_PADDING;
+                offsetX -= fabs(oldCamX - camera.x);
+            }
         }
 
         //Calculate avg fps
@@ -548,6 +569,17 @@ int main( int argc, char* args[] ){
             timerText.changeText(getTimeFormatted());
         }
         timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
+
+        if(gameComplete){
+            levelBeatenText.render( (WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
+            gameDoneText.render((WINDOW_WIDTH-gameDoneText.getWidth())/2, (WINDOW_HEIGHT+gameDoneText.getHeight()+levelBeatenText.getHeight())/2);
+            gameDoneText2.render((WINDOW_WIDTH-gameDoneText2.getWidth())/2, 
+                (WINDOW_HEIGHT-gameDoneText2.getHeight()-50));
+        } else if(box.completedLevel){
+            levelBeatenText.changeText("Escaped level "+to_string(currentLevelIndex+1));
+            levelBeatenText.render((WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
+        }
+
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop
