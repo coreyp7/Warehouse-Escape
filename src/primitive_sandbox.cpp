@@ -489,11 +489,22 @@ int main( int argc, char* args[] ){
         offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
 
         if(!box.completedLevel){
+            int ms = (SDL_GetTicks() - timeOfStart)/10;
             int seconds = (SDL_GetTicks() - timeOfStart)/1000;
             int minutes = seconds / 60;
             seconds -= (minutes*60);
+
+            string secondsStr;
+            if(seconds > 9){
+                secondsStr = to_string(seconds);
+            } else {
+                secondsStr = "0"+to_string(seconds);
+            }
+
+            string msString = to_string(ms);
+            msString = msString.substr(msString.size()-2);
             
-            timerText.changeText(to_string(minutes)+":"+to_string(seconds));
+            timerText.changeText(to_string(minutes)+" : "+secondsStr+" : "+msString);
             timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
         } else {
             timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
