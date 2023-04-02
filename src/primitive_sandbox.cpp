@@ -56,7 +56,7 @@ int playerStartX, playerStartY;
 int currentLevel = 0;
 
 int levelCompleted = false;
-int timeOfStart = 0; // start of timer in level
+Uint32 timeOfStart = 0; // start of timer in level
 int timeOfFinish = -1; // time when the user finished this level
 
 //Tile* tiles[1];
@@ -227,7 +227,12 @@ string getTimeFormatted(){
     }
 
     string msString = to_string(ms);
-    msString = msString.substr(msString.size()-2);
+    
+    // Prevent 'std::out_of_range' happening.
+    // basic_string::substr: __pos (which is 4294967295) > this->size() (which is 1)
+    if(msString.size() > 2){
+        msString = msString.substr(msString.size()-2);
+    }
 
     return to_string(minutes)+" : "+secondsStr+" : "+msString;
 }
@@ -373,6 +378,22 @@ int main( int argc, char* args[] ){
 
         dt = (SDL_GetTicks() - box.lastPhysicsUpdate) / 1000.0f;
         box.simulatePhysics(dt, *currentLevelTiles);
+
+        if(box.completedLevel){
+            currentLevelIndex++; // go to next level
+            if(currentLevelIndex >= NUMBER_OF_LEVELS){
+                close();
+                return 0;
+            }
+
+            currentLevelTiles = &levelTilesets[currentLevelIndex];
+            box.x = levelSpawnPoints[currentLevelIndex].first;
+            box.y = levelSpawnPoints[currentLevelIndex].second;
+            box.xvelocity = 0;
+            box.yvelocity = 0;
+            box.completedLevel = false;
+            timeOfStart = SDL_GetTicks();
+        }
         
 
         // Adjust camera position depending on player pos
