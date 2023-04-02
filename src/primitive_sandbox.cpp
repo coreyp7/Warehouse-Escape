@@ -201,7 +201,26 @@ bool loadLevel(string filename){
             }
         }
     }
+}
 
+// Return current time in timer format.
+string getTimeFormatted(){
+    Uint32 ms = (SDL_GetTicks() - timeOfStart)/10;
+    Uint32 seconds = (SDL_GetTicks() - timeOfStart)/1000;
+    Uint16 minutes = seconds / 60;
+    seconds -= (minutes*60);
+
+    string secondsStr;
+    if(seconds > 9){
+        secondsStr = to_string(seconds);
+    } else {
+        secondsStr = "0"+to_string(seconds);
+    }
+
+    string msString = to_string(ms);
+    msString = msString.substr(msString.size()-2);
+
+    return to_string(minutes)+" : "+secondsStr+" : "+msString;
 }
 
 int main( int argc, char* args[] ){
@@ -488,27 +507,11 @@ int main( int argc, char* args[] ){
         offsetText.changeText(oss4.str());
         offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
 
+        // Show timer
         if(!box.completedLevel){
-            int ms = (SDL_GetTicks() - timeOfStart)/10;
-            int seconds = (SDL_GetTicks() - timeOfStart)/1000;
-            int minutes = seconds / 60;
-            seconds -= (minutes*60);
-
-            string secondsStr;
-            if(seconds > 9){
-                secondsStr = to_string(seconds);
-            } else {
-                secondsStr = "0"+to_string(seconds);
-            }
-
-            string msString = to_string(ms);
-            msString = msString.substr(msString.size()-2);
-            
-            timerText.changeText(to_string(minutes)+" : "+secondsStr+" : "+msString);
-            timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
-        } else {
-            timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
+            timerText.changeText(getTimeFormatted());
         }
+        timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop
