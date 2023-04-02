@@ -44,11 +44,11 @@ SDL_Texture* bgTexture;
 int bgTextureHeight;
 int bgTextureWidth;
 
-vector<Tile> tiles;
+vector<string> levelNames;
+vector<Tile> *currentLevelTiles;
+vector<Tile> levelTilesets[2];
 
 int playerStartX, playerStartY;
-
-vector<string> levels;
 int currentLevel = 0;
 
 int levelCompleted = false;
@@ -152,20 +152,21 @@ int init(){
         return -6;
     }
 
-    levels.push_back("01_20_10");
-    levels.push_back("02_05_05");
+    levelNames.push_back("01_20_10");
+    levelNames.push_back("02_05_05");
 
 
     return 0;
 }
 
-bool loadLevel(string filename){
+vector<Tile> loadLevel(string filename){
+    vector<Tile> tiles;
     int x = 0, y = 0; // tile offsets
 
     std::ifstream map("levels/"+filename+".level");
     int width = stoi(filename.substr(3, 2));
     int length = stoi(filename.substr(6, 2));
-    printf("width:%i, length:%i", width, length);
+    //printf("width:%i, length:%i", width, length);
 
     if(map.fail()){
         printf("Unable to load map 1.");
@@ -201,6 +202,8 @@ bool loadLevel(string filename){
             }
         }
     }
+
+    return tiles;
 }
 
 // Return current time in timer format.
@@ -268,7 +271,11 @@ int main( int argc, char* args[] ){
 
     //loadLevel("levels/01.txt");
     //printf("levels[0]: %s", levels[0]);
-    loadLevel(levels[1]);
+    for(int i=0; i<levelNames.size(); i++){
+        levelTilesets[i] = loadLevel(levelNames[i]);
+    }
+    currentLevelTiles = &levelTilesets[0];
+
 
     Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
 
@@ -358,7 +365,7 @@ int main( int argc, char* args[] ){
         ///////////////////////////
 
         dt = (SDL_GetTicks() - box.lastPhysicsUpdate) / 1000.0f;
-        box.simulatePhysics(dt, tiles);
+        box.simulatePhysics(dt, *currentLevelTiles);
         
 
         // Adjust camera position depending on player pos
@@ -478,8 +485,9 @@ int main( int argc, char* args[] ){
         // TODO: initialize these variables outside while loop so you're not creating it everytime.
         
 
-        for(int i = 0; i<tiles.size(); i++){
-            tiles[i].render(camera.x, camera.y);
+        for(int i = 0; i<currentLevelTiles->size(); i++){
+            //currentLevelTiles[i]->render(camera.x, camera.y);
+            currentLevelTiles->at(i).render(camera.x, camera.y); // STUDY: look this up
         }
 
         //box.render();
