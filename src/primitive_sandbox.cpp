@@ -44,9 +44,13 @@ SDL_Texture* bgTexture;
 int bgTextureHeight;
 int bgTextureWidth;
 
+const int NUMBER_OF_LEVELS = 2; // Change this when you add/remove levels.
 vector<string> levelNames;
 vector<Tile> *currentLevelTiles;
-vector<Tile> levelTilesets[2];
+vector<Tile> levelTilesets[NUMBER_OF_LEVELS];
+vector<pair<int, int>> levelSpawnPoints;
+int currentLevelIndex = 0;
+
 
 int playerStartX, playerStartY;
 int currentLevel = 0;
@@ -190,8 +194,10 @@ vector<Tile> loadLevel(string filename){
                 tiles.push_back(Tile(renderer, endTileTexture, x, y, true));
             }
             else if(type == SPAWN_TILE){
-                playerStartX = x;
-                playerStartY = y;
+                // playerStartX = x;
+                // playerStartY = y;
+                std::pair<int, int> pos = {x, y};
+                levelSpawnPoints.push_back(pos);
             } 
 
             x += 75;
@@ -275,7 +281,8 @@ int main( int argc, char* args[] ){
         levelTilesets[i] = loadLevel(levelNames[i]);
     }
     currentLevelTiles = &levelTilesets[0];
-
+    playerStartX = levelSpawnPoints[0].first;
+    playerStartY = levelSpawnPoints[0].second;
 
     Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
 
