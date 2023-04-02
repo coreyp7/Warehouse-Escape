@@ -51,6 +51,10 @@ int playerStartX, playerStartY;
 vector<string> levels;
 int currentLevel = 0;
 
+int levelCompleted = false;
+int timeOfStart = 0; // start of timer in level
+int timeOfFinish = -1; // time when the user finished this level
+
 //Tile* tiles[1];
 
 
@@ -236,6 +240,8 @@ int main( int argc, char* args[] ){
     Text cameraText = Text(renderer, globalFont, textColor);
     Text velocityText = Text(renderer, globalFont, textColor);
     Text offsetText = Text(renderer, globalFont, textColor);
+
+    Text timerText = Text(renderer, globalFont, textColor);
 
     // Box box = Box(renderer, boxTexture, 
     // (WINDOW_WIDTH-50)/2, 
@@ -482,6 +488,16 @@ int main( int argc, char* args[] ){
         offsetText.changeText(oss4.str());
         offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
 
+        if(!box.completedLevel){
+            int seconds = (SDL_GetTicks() - timeOfStart)/1000;
+            int minutes = seconds / 60;
+            seconds -= (minutes*60);
+            
+            timerText.changeText(to_string(minutes)+":"+to_string(seconds));
+            timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
+        } else {
+            timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
+        }
 
         SDL_RenderPresent(renderer);
         countedFrames++; // NOTE: not sure if this should be lower in loop

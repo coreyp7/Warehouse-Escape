@@ -92,6 +92,7 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
             if(tile->finish){
                 printf("Finish reached.");
                 yvelocity = -1500;
+                completedLevel = true;
             } else {
                 float xDistance, yDistance;
                 if(x < tile->x){

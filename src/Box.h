@@ -88,4 +88,6 @@ class Box {
 
         SDL_Rect rect;
         SDL_Renderer* renderer;
+
+        bool completedLevel = false;
 };
