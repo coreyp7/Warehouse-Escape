@@ -57,6 +57,7 @@ int currentLevel = 0;
 
 int levelCompleted = false;
 Uint32 timeOfStartEntireGameRTA = 0; // for entire run of whole game
+bool completedRTA = false;
 Uint32 timeOfStart = 0; // start of timer in level
 int timeOfFinish = -1; // time when the user finished this level
 
@@ -397,6 +398,11 @@ int main( int argc, char* args[] ){
         box.simulatePhysics(dt, *currentLevelTiles);
 
         if(box.completedLevel){
+            // Stop RTA timer if totally done.
+            if(currentLevelIndex+1 >= NUMBER_OF_LEVELS){
+                completedRTA = true;
+            }
+
             if(timeOfFinish == -1){
                 timeOfFinish = SDL_GetTicks();
                 camera.y -= 100;
@@ -583,7 +589,7 @@ int main( int argc, char* args[] ){
         }
         timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight() - timerTextRTA.getHeight());
 
-        if(!gameComplete){
+        if(!completedRTA){
             timerTextRTA.changeText(getTimeFormatted(timeOfStartEntireGameRTA));
         }
         timerTextRTA.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerTextRTA.getHeight());
