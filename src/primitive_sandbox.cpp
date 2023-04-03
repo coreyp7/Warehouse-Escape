@@ -61,6 +61,8 @@ int timeOfFinish = -1; // time when the user finished this level
 
 bool gameComplete = false;
 
+bool debug = false;
+
 //Tile* tiles[1];
 
 
@@ -319,6 +321,11 @@ int main( int argc, char* args[] ){
                 case SDL_QUIT:
                     quit = true;
                     break;
+                case SDL_KEYDOWN:
+                    if(e.key.keysym.sym == SDLK_p){
+                        debug = !debug;
+                    }
+                    break;
                 case SDL_MOUSEBUTTONDOWN:
                     // If box is clicked, apply upward force to it.
                     int xmousepos = e.button.x;
@@ -543,26 +550,28 @@ int main( int argc, char* args[] ){
         box.render(camera.x, camera.y);
 
         // show avg fps text & ms text
-        avgFpsText.render(0, 0);
-        msText.changeText("ms render frame: "+std::to_string(SDL_GetTicks() - frameStart));
-        msText.render(0, avgFpsText.getHeight());
-        fpsText.render(0, avgFpsText.getHeight() + msText.getHeight());
-        std::ostringstream oss;
-        oss << "x:" << box.getX() << ", y:" << box.getY();
-        boxText.changeText(oss.str());
-        boxText.render(WINDOW_WIDTH - boxText.getWidth(), 0);
-        std::ostringstream oss2;
-        oss2 << "cam | x:" << camera.x << ", y:" << camera.y;
-        cameraText.changeText(oss2.str());
-        cameraText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight());
-        std::ostringstream oss3;
-        oss3 << "velocity: (" << box.getXVelocity() << ", " << box.getYVelocity() << ")";
-        velocityText.changeText(oss3.str());
-        velocityText.render(WINDOW_WIDTH - velocityText.getWidth(), boxText.getHeight() + cameraText.getHeight());
-        std::ostringstream oss4;
-        oss4 << "offsetY:" << offsetY << ", offsetX:" << offsetX;
-        offsetText.changeText(oss4.str());
-        offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
+        if(debug){
+            avgFpsText.render(0, 0);
+            msText.changeText("ms render frame: "+std::to_string(SDL_GetTicks() - frameStart));
+            msText.render(0, avgFpsText.getHeight());
+            fpsText.render(0, avgFpsText.getHeight() + msText.getHeight());
+            std::ostringstream oss;
+            oss << "x:" << box.getX() << ", y:" << box.getY();
+            boxText.changeText(oss.str());
+            boxText.render(WINDOW_WIDTH - boxText.getWidth(), 0);
+            std::ostringstream oss2;
+            oss2 << "cam | x:" << camera.x << ", y:" << camera.y;
+            cameraText.changeText(oss2.str());
+            cameraText.render(WINDOW_WIDTH - cameraText.getWidth(), boxText.getHeight());
+            std::ostringstream oss3;
+            oss3 << "velocity: (" << box.getXVelocity() << ", " << box.getYVelocity() << ")";
+            velocityText.changeText(oss3.str());
+            velocityText.render(WINDOW_WIDTH - velocityText.getWidth(), boxText.getHeight() + cameraText.getHeight());
+            std::ostringstream oss4;
+            oss4 << "offsetY:" << offsetY << ", offsetX:" << offsetX;
+            offsetText.changeText(oss4.str());
+            offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
+        }
 
         // Show timer
         if(!box.completedLevel){
