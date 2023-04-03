@@ -56,6 +56,7 @@ int playerStartX, playerStartY;
 int currentLevel = 0;
 
 int levelCompleted = false;
+Uint32 timeOfStartEntireGameRTA = 0; // for entire run of whole game
 Uint32 timeOfStart = 0; // start of timer in level
 int timeOfFinish = -1; // time when the user finished this level
 
@@ -216,10 +217,10 @@ vector<Tile> loadLevel(string filename){
     return tiles;
 }
 
-// Return current time in timer format.
-string getTimeFormatted(){
-    Uint32 ms = (SDL_GetTicks() - timeOfStart)/10;
-    Uint32 seconds = (SDL_GetTicks() - timeOfStart)/1000;
+// Return current time (since given time param in ticks) in timer format.
+string getTimeFormatted(Uint32 time){
+    Uint32 ms = (SDL_GetTicks() - time)/10;
+    Uint32 seconds = (SDL_GetTicks() - time)/1000;
     Uint16 minutes = seconds / 60;
     seconds -= (minutes*60);
 
@@ -236,6 +237,8 @@ string getTimeFormatted(){
     // basic_string::substr: __pos (which is 4294967295) > this->size() (which is 1)
     if(msString.size() > 2){
         msString = msString.substr(msString.size()-2);
+    } else {
+        msString = "0" + msString.substr(msString.size()-1);
     }
 
     return to_string(minutes)+" : "+secondsStr+" : "+msString;
@@ -279,6 +282,7 @@ int main( int argc, char* args[] ){
     Text offsetText = Text(renderer, globalFont, textColor);
 
     Text timerText = Text(renderer, globalFont, textColor);
+    Text timerTextRTA = Text(renderer, globalFont, textColor);
 
     Text levelBeatenText = Text(renderer, globalFont, textColor);
     Text gameDoneText = Text(renderer, globalFont, textColor);
@@ -575,9 +579,14 @@ int main( int argc, char* args[] ){
 
         // Show timer
         if(!box.completedLevel){
-            timerText.changeText(getTimeFormatted());
+            timerText.changeText(getTimeFormatted(timeOfStart));
         }
-        timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight());
+        timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight() - timerTextRTA.getHeight());
+
+        if(!gameComplete){
+            timerTextRTA.changeText(getTimeFormatted(timeOfStartEntireGameRTA));
+        }
+        timerTextRTA.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerTextRTA.getHeight());
 
         if(gameComplete){
             levelBeatenText.render( (WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
