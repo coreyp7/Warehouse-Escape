@@ -37,6 +37,8 @@ class Tile {
         // static const int BOX_HEIGHT = 50;
         static const int TILE_WIDTH = 75;
         static const int TILE_HEIGHT = 75;
+        // static const int TILE_WIDTH = 85;
+        // static const int TILE_HEIGHT = 85;
 
         // "hardware texture" for this tile
         SDL_Texture* texture;

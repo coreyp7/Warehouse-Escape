@@ -166,8 +166,8 @@ int init(){
 
     // levelNames.push_back("01_21_10");
     // levelNames.push_back("02_21_19");
-    levelNames.push_back("03_42_12");
-
+    //levelNames.push_back("03_42_12");
+    levelNames.push_back("04_15_35");
 
     return 0;
 }
@@ -198,7 +198,7 @@ vector<Tile> loadLevel(string filename){
             } 
             else if(type == GROUND_TILE){
                 tiles.push_back(Tile(renderer, tileTexture, x, y));
-            } 
+            }
             else if(type == END_TILE){
                 tiles.push_back(Tile(renderer, endTileTexture, x, y, true));
             }
