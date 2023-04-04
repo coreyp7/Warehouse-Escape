@@ -18,8 +18,10 @@ using namespace std;
 // Defining some global constants + other shit
 // const int WINDOW_WIDTH = 640;
 // const int WINDOW_HEIGHT = 480;
-const int WINDOW_WIDTH = 720;
-const int WINDOW_HEIGHT = 480;
+// const int WINDOW_WIDTH = 720;
+// const int WINDOW_HEIGHT = 480;
+const int WINDOW_WIDTH = 1080;
+const int WINDOW_HEIGHT = 720;
 
 const int CAMERA_PADDING = 75;
 
@@ -162,8 +164,9 @@ int init(){
         return -6;
     }
 
-    levelNames.push_back("01_20_10");
-    levelNames.push_back("02_05_05");
+    // levelNames.push_back("01_21_10");
+    // levelNames.push_back("02_21_19");
+    levelNames.push_back("03_42_12");
 
 
     return 0;
