@@ -85,10 +85,15 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
 
     Tile* tile; // look into this, if its leaking memory
 
+
     for(int i=0; i<tiles.size(); i++){
         tile = &tiles[i];
 
         if(tile->isColliding(this)){
+            if(tile->y == floor(y)+1){
+                printf("FOUND IT");
+            }
+
             if(tile->finish){
                 printf("Finish reached.");
                 yvelocity = -1500;
@@ -107,15 +112,9 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                     yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
                 }
 
-                if(xDistance < yDistance){
-                    // fix x-axis of box only
-                    if(xvelocity > 0){
-                        x -= xDistance;
-                    } else {
-                        x += xDistance;
-                    }
-                    xvelocity = 0;
-                } else if(xDistance > yDistance) {
+                float deviation = 0.5;
+
+                if(xDistance > yDistance) {
                     // fix y-axis of box only
                     if(yvelocity > 0){
                         y -= yDistance;
@@ -130,15 +129,61 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                     } else {
                         xvelocity = 0;
                     }
-                } else {
-                    // prioritize x for literally no reason
-                    if(xvelocity > 0){
-                        x -= xDistance;
-                    } else {
-                        x += xDistance;
-                    }
-                    xvelocity = 0;
                 }
+                else if(xDistance < yDistance){
+                    if((yDistance - xDistance) <= deviation){
+                        // ignore
+                    } else {
+                        // fix x-axis of box only
+                        if(xvelocity > 0){
+                            x -= xDistance;
+                        } else {
+                            x += xDistance;
+                        }
+                        xvelocity = 0;
+                    }
+                } else {
+                    // // prioritize x for literally no reason
+                    // if(xvelocity > 0){
+                    //     x -= xDistance;
+                    // } else {
+                    //     x += xDistance;
+                    // }
+                    // xvelocity = 0;
+                }
+
+                // if(xDistance < yDistance){
+                //     // fix x-axis of box only
+                //     if(xvelocity > 0){
+                //         x -= xDistance;
+                //     } else {
+                //         x += xDistance;
+                //     }
+                //     xvelocity = 0;
+                // } else if(xDistance > yDistance) {
+                //     // fix y-axis of box only
+                //     if(yvelocity > 0){
+                //         y -= yDistance;
+                //     } else {
+                //         y += yDistance;
+                //     }
+                //     yvelocity = 0;
+                //     if(xvelocity > 4){
+                //         xvelocity += dt * (-X_FRICTION);
+                //     } else if(xvelocity < -4){
+                //         xvelocity += dt * X_FRICTION;
+                //     } else {
+                //         xvelocity = 0;
+                //     }
+                // } else {
+                //     // prioritize x for literally no reason
+                //     if(xvelocity > 0){
+                //         x -= xDistance;
+                //     } else {
+                //         x += xDistance;
+                //     }
+                //     xvelocity = 0;
+                // }
             }
         }
     }

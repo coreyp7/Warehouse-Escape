@@ -46,7 +46,7 @@ SDL_Texture* bgTexture;
 int bgTextureHeight;
 int bgTextureWidth;
 
-const int NUMBER_OF_LEVELS = 2; // Change this when you add/remove levels.
+const int NUMBER_OF_LEVELS = 4; // Change this when you add/remove levels.
 vector<string> levelNames;
 vector<Tile> *currentLevelTiles;
 vector<Tile> levelTilesets[NUMBER_OF_LEVELS];
@@ -164,9 +164,10 @@ int init(){
         return -6;
     }
 
-    // levelNames.push_back("01_21_10");
-    // levelNames.push_back("02_21_19");
-    //levelNames.push_back("03_42_12");
+    //levelNames.push_back("00_21_10");
+    levelNames.push_back("01_21_10");
+    levelNames.push_back("02_21_19");
+    levelNames.push_back("03_42_12");
     levelNames.push_back("04_15_35");
 
     return 0;
