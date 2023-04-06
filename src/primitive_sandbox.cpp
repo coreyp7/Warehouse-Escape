@@ -23,7 +23,8 @@ using namespace std;
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
 
-const int CAMERA_PADDING = 75;
+//const int CAMERA_PADDING = 75;
+const int CAMERA_PADDING = 125;
 
 const int EMPTY_TILE = 0;
 const int GROUND_TILE = 1;
@@ -41,6 +42,7 @@ SDL_Texture* tileTexture;
 SDL_Texture* endTileTexture;
 
 TTF_Font* globalFont;
+TTF_Font* timerFont;
 
 SDL_Texture* bgTexture;
 int bgTextureHeight;
@@ -116,6 +118,12 @@ bool loadMedia(){
         return -7;
     }
 
+    timerFont = TTF_OpenFont("img/primitive_sandbox/AdvancedPixel.ttf", 30);
+    if(timerFont == NULL){
+		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+        return -8;
+    }
+
     return success;
 }
 
@@ -183,7 +191,7 @@ vector<Tile> loadLevel(string filename){
     //printf("width:%i, length:%i", width, length);
 
     if(map.fail()){
-        printf("Unable to load map 1.");
+        //printf("Unable to load map 1.");
     } else {
         for(int i=0; i<(width*length); i++){
             int type = -1;
@@ -191,7 +199,7 @@ vector<Tile> loadLevel(string filename){
             map >> type;
 
             if(map.fail()){
-                printf("Unable to load map 2.");
+                //printf("Unable to load map 2.");
             }
 
             if(type == EMPTY_TILE){
@@ -246,7 +254,7 @@ string getTimeFormatted(Uint32 time){
         msString = "0" + msString.substr(msString.size()-1);
     }
 
-    return to_string(minutes)+" : "+secondsStr+" : "+msString;
+    return to_string(minutes)+":"+secondsStr+":"+msString;
 }
 
 int main( int argc, char* args[] ){
@@ -286,8 +294,8 @@ int main( int argc, char* args[] ){
     Text velocityText = Text(renderer, globalFont, textColor);
     Text offsetText = Text(renderer, globalFont, textColor);
 
-    Text timerText = Text(renderer, globalFont, textColor);
-    Text timerTextRTA = Text(renderer, globalFont, textColor);
+    Text timerText = Text(renderer, timerFont, textColor);
+    Text timerTextRTA = Text(renderer, timerFont, textColor);
 
     Text levelBeatenText = Text(renderer, globalFont, textColor);
     Text gameDoneText = Text(renderer, globalFont, textColor);
@@ -323,9 +331,6 @@ int main( int argc, char* args[] ){
         while( SDL_PollEvent( &e ) != 0 ){
             
             // // User requests quit
-            // if (e.type == SDL_QUIT){
-            //     quit = true;
-            // }
             switch (e.type){
                 case SDL_QUIT:
                     quit = true;
@@ -591,12 +596,14 @@ int main( int argc, char* args[] ){
         if(!box.completedLevel){
             timerText.changeText(getTimeFormatted(timeOfStart));
         }
-        timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight() - timerTextRTA.getHeight());
+        //timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight() - timerTextRTA.getHeight());
 
         if(!completedRTA){
             timerTextRTA.changeText(getTimeFormatted(timeOfStartEntireGameRTA));
         }
-        timerTextRTA.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerTextRTA.getHeight());
+        //timerTextRTA.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerTextRTA.getHeight());
+        timerTextRTA.render((WINDOW_WIDTH - timerText.getWidth())/2, 10);
+        timerText.render((WINDOW_WIDTH - timerText.getWidth())/2, timerTextRTA.getHeight() + 10);
 
         if(gameComplete){
             levelBeatenText.render( (WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
