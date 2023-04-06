@@ -84,7 +84,7 @@ void close(){
 bool loadMedia(){
     bool success = true;
 
-    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box_final.png");
+    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box_final5.png");
     if(boxTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
