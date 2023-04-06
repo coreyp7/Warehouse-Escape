@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float startingPosY) {
-    // constructor stuff go here
+    this->renderer = renderer;
     this->texture = texture;
 
     x = startingPosX;
@@ -11,13 +11,8 @@ Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float
     xvelocity = 0;
     yvelocity = 0;
 
-    this->renderer = renderer;
-
     lastPhysicsUpdate = 0;
-    applyForceJump = false;
-
 }
-
 
 void Box::applyForceUp(){
     yvelocity = CLICK_VELOCITY;
@@ -207,10 +202,14 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
     //     //xvelocity = 0; // stop box on land
     // }
 
+    tile = NULL;
     lastPhysicsUpdate = SDL_GetTicks();
 }
 
 Box::~Box() {
-    // destructor stuff go here
+    // There's no dynamically allocated memory in here.
+    // The two pointers in Box (renderer and texture) are
+    // properly cleaned up in main, so don't need to
+    // do anything in here.
 }
 

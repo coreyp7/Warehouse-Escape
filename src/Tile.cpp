@@ -1,14 +1,6 @@
 #include "Tile.h"
 #include <cmath>
 
-Tile::Tile(){
-
-}
-
-Tile::~Tile(){
-    
-}
-
 Tile::Tile(SDL_Renderer* renderer, SDL_Texture* texture, float x, float y, bool finish){
     this->renderer = renderer;
     this->texture = texture;
@@ -31,4 +23,11 @@ bool Tile::isColliding(Box* box){
         && ((box->y + box->BOX_HEIGHT) > y);
 
     return collisionX && collisionY;
+}
+
+Tile::~Tile(){
+    // There's no dynamically allocated memory in here.
+    // The two pointers in Tile (renderer and texture) are
+    // properly cleaned up in main, so don't need to
+    // do anything in here.
 }

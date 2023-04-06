@@ -63,9 +63,7 @@ class Box {
         void applyForceUp();
         void applyXVelocity(float force);
         void applyXYVelocity(float xForce, float yForce);
-        // Box's size is hardcoded.
-        // static const int BOX_WIDTH = 50;
-        // static const int BOX_HEIGHT = 50;
+
         static const int BOX_WIDTH = 75;
         static const int BOX_HEIGHT = 75;
 
@@ -78,13 +76,10 @@ class Box {
         //static const int X_MAX_LIMIT = 565; 
         //static const int X_MIN_LIMIT = 20;
 
-        // "hardware texture" for this box. Obtained from constructor.
         SDL_Texture* texture;
 
         float x, y;
         float xvelocity, yvelocity;
-
-        bool applyForceJump;
 
         SDL_Rect rect;
         SDL_Renderer* renderer;

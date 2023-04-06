@@ -31,11 +31,20 @@ const int GROUND_TILE = 1;
 const int END_TILE = 2;
 const int SPAWN_TILE = 3;
 
+const SDL_Color SDL_COLOR_BLACK = { 0, 0, 0, 255 }; // black
+const SDL_Color SDL_COLOR_GRAY = {255, 255, 255, 255};
+const SDL_Color SDL_COLOR_GREEN = {76, 187, 23, 255};
+
 // FPS Cap when rendering. 60 by default.
 short int fpsCap = 60;
 
 SDL_Window* mainWindow;
 SDL_Renderer* renderer;
+
+
+SDL_Texture* bgTexture;
+int bgTextureHeight;
+int bgTextureWidth;
 
 SDL_Texture* boxTexture;
 SDL_Texture* tileTexture;
@@ -44,20 +53,16 @@ SDL_Texture* endTileTexture;
 TTF_Font* globalFont;
 TTF_Font* timerFont;
 
-SDL_Texture* bgTexture;
-int bgTextureHeight;
-int bgTextureWidth;
-
 const int NUMBER_OF_LEVELS = 4; // Change this when you add/remove levels.
-vector<string> levelNames;
-vector<Tile> *currentLevelTiles;
-vector<Tile> levelTilesets[NUMBER_OF_LEVELS];
-vector<pair<int, int>> levelSpawnPoints;
 int currentLevelIndex = 0;
+vector<string> levelNames;
+vector<Tile> *currentLevelTiles; // current level's tileset.
+vector<Tile> levelTilesets[NUMBER_OF_LEVELS]; // array of every level's tileset.
+vector<pair<int, int>> levelSpawnPoints;
 
 
 int playerStartX, playerStartY;
-int currentLevel = 0;
+//int currentLevel = 0;
 
 int levelCompleted = false;
 Uint32 timeOfStartEntireGameRTA = 0; // for entire run of whole game
@@ -69,21 +74,31 @@ bool gameComplete = false;
 
 bool debug = false;
 
-//Tile* tiles[1];
 
 
 void close(){
     SDL_DestroyTexture( boxTexture );
+    SDL_DestroyTexture( tileTexture );
+    SDL_DestroyTexture( endTileTexture );
     SDL_DestroyTexture( bgTexture );
+    TTF_CloseFont(globalFont);
+    TTF_CloseFont(timerFont);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(mainWindow);
+
     boxTexture = NULL;
+    tileTexture = NULL;
+    endTileTexture = NULL;
+    bgTexture = NULL;
+    globalFont = NULL;
+    timerFont = NULL;
     renderer = NULL;
     mainWindow = NULL;
+
 }
 
 // For loading all png/font stuff into their SDL_Texture fields.
-bool loadMedia(){
+bool loadAssets(){
     bool success = true;
 
     boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box_final5.png");
@@ -153,7 +168,7 @@ int init(){
     }
 
     // todo: set renderer draw color to black/default
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+    //SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 
     // todo: initialize sdl_image
     int imgFlags = IMG_INIT_PNG;
@@ -167,8 +182,8 @@ int init(){
         return -5;
     }
 
-    // load box texture
-    if (!loadMedia()){
+    // load all textures and fonts
+    if (!loadAssets()){
         return -6;
     }
 
@@ -212,8 +227,7 @@ vector<Tile> loadLevel(string filename){
                 tiles.push_back(Tile(renderer, endTileTexture, x, y, true));
             }
             else if(type == SPAWN_TILE){
-                // playerStartX = x;
-                // playerStartY = y;
+                // if there's more than one then this breaks
                 std::pair<int, int> pos = {x, y};
                 levelSpawnPoints.push_back(pos);
             } 
@@ -230,7 +244,7 @@ vector<Tile> loadLevel(string filename){
     return tiles;
 }
 
-// Return current time (since given time param in ticks) in timer format.
+// Return current time since the given time param in ticks in timer format.
 string getTimeFormatted(Uint32 time){
     Uint32 ms = (SDL_GetTicks() - time)/10;
     Uint32 seconds = (SDL_GetTicks() - time)/1000;
@@ -267,60 +281,58 @@ int main( int argc, char* args[] ){
     }
 
     // Main loop starts
-    bool quit = false; // Main loop flag
+    bool quit = false;
 
     SDL_Event e; // Event handler
 
     // FPS Stuff
     Uint32 frameStart = 0;
-    // Keep track of the time of each frame.
+
+    // How long it took to complete the last frame.
     int frameTimeToComplete = 0;
+
+    // "Delta time"
+    // Used to apply physics in terms of time instead of frames.
+    float dt = 0.0;
 
     float avgFPS = 0.0;
 
-    float dt = 0.0;
+    int countedFrames = 0; // total frames rendered while application running (for avg fps calculation)
+    std::stringstream avgFpsStr;
 
-    int countedFrames = 0; // keeps track of total frames rendered while application running
-    std::stringstream avgFpsStr; // string for displaying counted
+    // UI text to show.
+    Text timerText = Text(renderer, timerFont, SDL_COLOR_GREEN);
+    Text timerTextRTA = Text(renderer, timerFont, SDL_COLOR_GREEN);
 
-    // Text objects to show.
-    SDL_Color textColor = { 0, 0, 0, 255 }; // black
-    Text avgFpsText = Text(renderer, globalFont, textColor);
-    Text msText = Text(renderer, globalFont, textColor);
-    Text fpsText = Text(renderer, globalFont, textColor);
-    fpsText.changeText("FPS cap: " +std::to_string(fpsCap));
-    Text boxText = Text(renderer, globalFont, textColor);
-    Text cameraText = Text(renderer, globalFont, textColor);
-    Text velocityText = Text(renderer, globalFont, textColor);
-    Text offsetText = Text(renderer, globalFont, textColor);
+    Text levelBeatenText = Text(renderer, globalFont, SDL_COLOR_GRAY);
+    Text gameDoneText = Text(renderer, globalFont, SDL_COLOR_GRAY);
+    Text gameDoneText2 = Text(renderer, globalFont, SDL_COLOR_GRAY);
 
-    Text timerText = Text(renderer, timerFont, textColor);
-    Text timerTextRTA = Text(renderer, timerFont, textColor);
+    // Debug text
+    Text avgFpsText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    Text msText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    //Text fpsText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    Text boxText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    Text cameraText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    Text velocityText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    Text offsetText = Text(renderer, globalFont, SDL_COLOR_BLACK);
 
-    Text levelBeatenText = Text(renderer, globalFont, textColor);
-    Text gameDoneText = Text(renderer, globalFont, textColor);
-    Text gameDoneText2 = Text(renderer, globalFont, textColor);
-
-    // Box box = Box(renderer, boxTexture, 
-    // (WINDOW_WIDTH-50)/2, 
-    // 0);
-
-    //loadLevel("levels/01.txt");
-    //printf("levels[0]: %s", levels[0]);
+    // Load all level files and put into vector.
     for(int i=0; i<levelNames.size(); i++){
         levelTilesets[i] = loadLevel(levelNames[i]);
     }
-    currentLevelTiles = &levelTilesets[0];
+    currentLevelTiles = &levelTilesets[0]; // set current level to first level address
     playerStartX = levelSpawnPoints[0].first;
     playerStartY = levelSpawnPoints[0].second;
 
+    // Player object is called box for some reason
     Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
-    int offsetY = 0; // for offsetting the background images.
+    int offsetY = 0; // for offsetting the background textures.
     int offsetX = 0;
-    int newStartY = 0; // indicates where scrolling should begin again.
+    int newStartY = 0; // indicates where scrolling should begin again for bg.
     int newStartX = 0;
 
     // While game is running
@@ -573,7 +585,7 @@ int main( int argc, char* args[] ){
             avgFpsText.render(0, 0);
             msText.changeText("ms render frame: "+std::to_string(SDL_GetTicks() - frameStart));
             msText.render(0, avgFpsText.getHeight());
-            fpsText.render(0, avgFpsText.getHeight() + msText.getHeight());
+            //fpsText.render(0, avgFpsText.getHeight() + msText.getHeight());
             std::ostringstream oss;
             oss << "x:" << box.getX() << ", y:" << box.getY();
             boxText.changeText(oss.str());
@@ -627,6 +639,13 @@ int main( int argc, char* args[] ){
         }
 
     }
+
+    avgFpsText.~Text();
+    msText.~Text();
+    boxText.~Text();
+    cameraText.~Text();
+    velocityText.~Text();
+    offsetText.~Text();
 
     //Free resources and close SDL
     close();
