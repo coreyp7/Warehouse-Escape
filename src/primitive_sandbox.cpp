@@ -84,13 +84,13 @@ void close(){
 bool loadMedia(){
     bool success = true;
 
-    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/boxBig.png");
+    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box_final.png");
     if(boxTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
     }
 
-    tileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/tile.png");
+    tileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/tile_final.png");
     if(tileTexture == NULL){
         printf("Couldn't load tile texture. %s", IMG_GetError());
         success = false;
@@ -102,7 +102,7 @@ bool loadMedia(){
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/wall.png");
+    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/warehouse.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
     }
