@@ -107,24 +107,28 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                 float deviation = 0.5;
 
                 if(xDistance > yDistance) {
-                    // fix y-axis of box only
-                    if(yvelocity > 0){
-                        y -= yDistance;
+                    if((xDistance - yDistance) <= deviation){
+                        // ignore: helps avoid getting stuck on tiles
                     } else {
-                        y += yDistance;
-                    }
-                    yvelocity = 0;
-                    if(xvelocity > 4){
-                        xvelocity += dt * (-X_FRICTION);
-                    } else if(xvelocity < -4){
-                        xvelocity += dt * X_FRICTION;
-                    } else {
-                        xvelocity = 0;
+                        // fix y-axis of box only
+                        if(yvelocity > 0){
+                            y -= yDistance;
+                        } else {
+                            y += yDistance;
+                        }
+                        yvelocity = 0;
+                        if(xvelocity > 4){
+                            xvelocity += dt * (-X_FRICTION);
+                        } else if(xvelocity < -4){
+                            xvelocity += dt * X_FRICTION;
+                        } else {
+                            xvelocity = 0;
+                        }
                     }
                 }
                 else if(xDistance < yDistance){
                     if((yDistance - xDistance) <= deviation){
-                        // ignore
+                        // ignore: helps avoid getting stuck on tiles
                     } else {
                         // fix x-axis of box only
                         if(xvelocity > 0){
