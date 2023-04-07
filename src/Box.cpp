@@ -72,8 +72,8 @@ float Box::getXVelocity(){
 void Box::simulatePhysics(float dt, vector<Tile> &tiles){
     yvelocity += dt * GRAVITY;
 
-    int xold = x;
-    int yold = y;
+    float xold = x;
+    float yold = y;
 
     y += yvelocity * dt;
     x += xvelocity * dt;
@@ -91,6 +91,10 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                 yvelocity = -1500;
                 completedLevel = true;
             } else {
+                
+                // 1. check if xold is valid, keep if it is
+                // 2. check if yold is valid, keep if it is
+                // 3. keep as old else
                 float xDistance, yDistance;
                 if(x < tile->x){
                     xDistance = ((x + BOX_WIDTH) - tile->x);
@@ -104,49 +108,48 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                     yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
                 }
 
-                float deviation = 0.5;
-
-                if(xDistance > yDistance) {
-                    if((xDistance - yDistance) <= deviation){
-                        // ignore: helps avoid getting stuck on tiles
+                if(!tile->isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT)){
+                    // keep xold, move on to next tile
+                    //x = xold;
+                    // fix x-axis of box only
+                    if(xvelocity > 0){
+                        x -= xDistance;
                     } else {
-                        // fix y-axis of box only
-                        if(yvelocity > 0){
-                            y -= yDistance;
-                        } else {
-                            y += yDistance;
-                        }
-                        yvelocity = 0;
-                        if(xvelocity > 4){
-                            xvelocity += dt * (-X_FRICTION);
-                        } else if(xvelocity < -4){
-                            xvelocity += dt * X_FRICTION;
-                        } else {
-                            xvelocity = 0;
-                        }
+                        x += xDistance;
                     }
-                }
-                else if(xDistance < yDistance){
-                    if((yDistance - xDistance) <= deviation){
-                        // ignore: helps avoid getting stuck on tiles
+                    xvelocity = 0;
+                    printf("xold:%f, yold:%f, x:%f, y:%f\n", xold, yold, x, y);
+                } else if (!tile->isColliding(x, yold, BOX_WIDTH, BOX_HEIGHT)){
+                    // keep yold, move on to next tile
+                    //y = yold;
+                    // fix y-axis of box only
+                    if(yvelocity > 0){
+                        y -= yDistance;
                     } else {
-                        // fix x-axis of box only
-                        if(xvelocity > 0){
-                            x -= xDistance;
-                        } else {
-                            x += xDistance;
-                        }
+                        y += yDistance;
+                    }
+                    yvelocity = 0;
+                    if(xvelocity > 4){
+                        xvelocity += dt * (-X_FRICTION);
+                    } else if(xvelocity < -4){
+                        xvelocity += dt * X_FRICTION;
+                    } else {
                         xvelocity = 0;
                     }
+                    
                 } else {
-                    // // prioritize x for literally no reason
-                    // if(xvelocity > 0){
-                    //     x -= xDistance;
-                    // } else {
-                    //     x += xDistance;
-                    // }
-                    // xvelocity = 0;
+                    // keep both old vars
+                    x = xold;
+                    y = yold;
                 }
+
+
+
+
+
+
+
+
 
                 // if(xDistance < yDistance){
                 //     // fix x-axis of box only

@@ -25,6 +25,12 @@ bool Tile::isColliding(Box* box){
     return collisionX && collisionY;
 }
 
+bool Tile::isColliding(float xpos, float ypos, int width, int height){
+    bool collisionX = ((x + TILE_WIDTH) > xpos) && ((xpos + width) > x);
+    bool collisionY = ((y + TILE_HEIGHT) > ypos) && ((ypos + height) > y);
+    return collisionX && collisionY;
+}
+
 Tile::~Tile(){
     // There's no dynamically allocated memory in here.
     // The two pointers in Tile (renderer and texture) are

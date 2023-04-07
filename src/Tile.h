@@ -21,6 +21,7 @@ class Tile {
         // Given (x,y) of Box, returns if it is colliding
         // with this Tile.
         bool isColliding(Box* box);
+        bool isColliding(float x, float y, int width, int height);
 
         static const int TILE_WIDTH = 75;
         static const int TILE_HEIGHT = 75;
