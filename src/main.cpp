@@ -67,15 +67,23 @@ bool gameComplete = false;
 bool debug = false;
 
 Mix_Music *music = NULL;
-Mix_Chunk *forceSound = NULL;
+Mix_Chunk *hit1 = NULL;
 
 void close(){
     SDL_DestroyTexture( boxTexture );
     SDL_DestroyTexture( tileTexture );
     SDL_DestroyTexture( endTileTexture );
     SDL_DestroyTexture( bgTexture );
+
     TTF_CloseFont(globalFont);
     TTF_CloseFont(timerFont);
+    TTF_Quit();
+
+    Mix_FreeChunk(hit1);
+    Mix_FreeMusic(music);
+    Mix_CloseAudio();
+    Mix_Quit();
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(mainWindow);
 
@@ -136,6 +144,12 @@ bool loadAssets(){
     if(music == NULL){
         printf("Failed to load music. %s\n", Mix_GetError());
         return -9;
+    }
+
+    hit1 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit1.wav");
+    if(hit1 == NULL){
+        printf("Failed to load hit1. %s\n", Mix_GetError());
+        return -10;
     }
 
     return success;
@@ -341,6 +355,8 @@ int main( int argc, char* args[] ){
     int newStartX = 0;
 
     Mix_PlayMusic(music, -1);
+    Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+    Mix_VolumeChunk(hit1, MIX_MAX_VOLUME/3);
 
     // While game is running
     while(!quit){
@@ -369,6 +385,7 @@ int main( int argc, char* args[] ){
                     if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
+                        Mix_PlayChannel(-1, hit1, 0);
                         // apply vertical
                         int scaling = 20;
 
