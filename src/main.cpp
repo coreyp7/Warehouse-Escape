@@ -68,6 +68,9 @@ bool debug = false;
 
 Mix_Music *music = NULL;
 Mix_Chunk *hit1 = NULL;
+Mix_Chunk *hit2 = NULL;
+Mix_Chunk *hit3 = NULL;
+Mix_Chunk* hitsounds[3];;
 
 void close(){
     SDL_DestroyTexture( boxTexture );
@@ -91,8 +94,13 @@ void close(){
     tileTexture = NULL;
     endTileTexture = NULL;
     bgTexture = NULL;
+
     globalFont = NULL;
     timerFont = NULL;
+
+    music = NULL;
+    hit1 = NULL;
+
     renderer = NULL;
     mainWindow = NULL;
 
@@ -149,6 +157,18 @@ bool loadAssets(){
     hit1 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit1.wav");
     if(hit1 == NULL){
         printf("Failed to load hit1. %s\n", Mix_GetError());
+        return -10;
+    }
+
+    hit2 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit2.wav");
+    if(hit1 == NULL){
+        printf("Failed to load hit2. %s\n", Mix_GetError());
+        return -10;
+    }
+
+    hit3 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit3.wav");
+    if(hit1 == NULL){
+        printf("Failed to load hit3. %s\n", Mix_GetError());
         return -10;
     }
 
@@ -354,9 +374,14 @@ int main( int argc, char* args[] ){
     int newStartY = 0; // indicates where scrolling should begin again for bg.
     int newStartX = 0;
 
+    hitsounds[0] = hit1;
+    hitsounds[1] = hit2;
+    hitsounds[2] = hit3;
     Mix_PlayMusic(music, -1);
-    Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+    Mix_VolumeMusic(MIX_MAX_VOLUME/3);
     Mix_VolumeChunk(hit1, MIX_MAX_VOLUME/3);
+    Mix_VolumeChunk(hit2, MIX_MAX_VOLUME/3);
+    Mix_VolumeChunk(hit3, MIX_MAX_VOLUME/3);
 
     // While game is running
     while(!quit){
@@ -385,7 +410,10 @@ int main( int argc, char* args[] ){
                     if(xmousepos > xbox && xmousepos < xbox+box.getWidth() &&
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
-                        Mix_PlayChannel(-1, hit1, 0);
+                        int numb = rand() % 3;
+                        Mix_PlayChannel(-1, hitsounds[numb], 0);
+                        printf("Playing %i", numb);
+
                         // apply vertical
                         int scaling = 20;
 
