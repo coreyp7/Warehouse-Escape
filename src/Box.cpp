@@ -108,7 +108,9 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                     yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
                 }
 
-                if(!tile->isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT)){
+                if(!tile->isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT) &&
+                    ! tiles[i-1].isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT) &&
+                    ! tiles[i+1].isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT)){
                     // keep xold, move on to next tile
                     //x = xold;
                     // fix x-axis of box only
