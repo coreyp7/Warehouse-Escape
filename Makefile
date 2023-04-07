@@ -1,4 +1,4 @@
-FILENAME = primitive_sandbox
+FILENAME = main
 
 #OBJS specifies which files to compile as part of the project
 OBJS = src\$(FILENAME).cpp src\Text.cpp src\Box.cpp src\Tile.cpp
@@ -24,7 +24,7 @@ LIBRARY_PATHS = -LC:\MinGW\lib
 LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer
 
 #OBJ_NAME specifies the name of our exectuable
-OBJ_NAME = exe\$(FILENAME)
+OBJ_NAME = exe\WarehouseEscape
 
 #This is the target that compiles our executable
 all : $(OBJS)

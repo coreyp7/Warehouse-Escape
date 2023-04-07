@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <stdio.h>
 #include <string>
 #include <sstream>
@@ -65,7 +66,8 @@ bool gameComplete = false;
 
 bool debug = false;
 
-
+Mix_Music *music = NULL;
+Mix_Chunk *forceSound = NULL;
 
 void close(){
     SDL_DestroyTexture( boxTexture );
@@ -130,6 +132,12 @@ bool loadAssets(){
         return -8;
     }
 
+    music = Mix_LoadMUS("img/primitive_sandbox/phoon.wav");
+    if(music == NULL){
+        printf("Failed to load music. %s\n", Mix_GetError());
+        return -9;
+    }
+
     return success;
 }
 
@@ -168,6 +176,11 @@ int init(){
     if( TTF_Init() == -1){
         printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
         return -5;
+    }
+
+    if( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0){
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+		return -7;
     }
 
     // load all textures and fonts
@@ -326,6 +339,8 @@ int main( int argc, char* args[] ){
     int offsetX = 0;
     int newStartY = 0; // indicates where scrolling should begin again for bg.
     int newStartX = 0;
+
+    Mix_PlayMusic(music, -1);
 
     // While game is running
     while(!quit){
