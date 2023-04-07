@@ -32,22 +32,16 @@ using namespace std;
  */
 class Box {
     public:
-        Uint32 lastPhysicsUpdate;
-
         Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float startingPosY);
         ~Box(); // destructor, cleans up everything for this box.
-
-        // Constructor that sets this box's SDL_Texture field "texture"
-        // with an alredy created SDL_Texture.
-        Box(SDL_Texture* boxTexture);
         
         // Render this box at the specified x,y location
         // Abstracts all the SDL calls for rendering stuff for us.
         // ( Will use SDL_RenderCopyEx() )
-        void render();
+        // void render();
         // Render this Box relative to the camera's position.
         void render(int xcam, int ycam);
-        void renderTESTINGONLY(int posx, int posy);
+        // void renderTESTINGONLY(int posx, int posy);
 
         int getWidth();
         int getHeight();
@@ -56,12 +50,9 @@ class Box {
         float getXVelocity();
         float getYVelocity();
 
-        void simulatePhysics(float dt);
-        void simulatePhysics(float dt, Tile* tile);
-        //void simulatePhysics(float dt, vector<Tile> tiles);
         void simulatePhysics(float dt, vector<Tile> &tiles);
-        void applyForceUp();
-        void applyXVelocity(float force);
+        // void applyForceUp();
+        // void applyXVelocity(float force);
         void applyXYVelocity(float xForce, float yForce);
 
         static const int BOX_WIDTH = 75;
@@ -72,17 +63,13 @@ class Box {
         static constexpr float GRAVITY = 700.0f; 
         static constexpr float X_FRICTION = 700.0f;
 
-        // CHANGE: pass value from main to allow for multiple screen sizes.
-        //static const int X_MAX_LIMIT = 565; 
-        //static const int X_MIN_LIMIT = 20;
-
+        SDL_Renderer* renderer;
         SDL_Texture* texture;
 
         float x, y;
         float xvelocity, yvelocity;
 
         SDL_Rect rect;
-        SDL_Renderer* renderer;
 
         bool completedLevel = false;
 };

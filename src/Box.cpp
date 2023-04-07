@@ -10,40 +10,35 @@ Box::Box(SDL_Renderer* renderer, SDL_Texture* texture, float startingPosX, float
     y = startingPosY;
     xvelocity = 0;
     yvelocity = 0;
-
-    lastPhysicsUpdate = 0;
 }
 
-void Box::applyForceUp(){
-    yvelocity = CLICK_VELOCITY;
-}
+// void Box::applyForceUp(){
+//     yvelocity = CLICK_VELOCITY;
+// }
 
-void Box::applyXVelocity(float force){
-    xvelocity = force;
-}
+// void Box::applyXVelocity(float force){
+//     xvelocity = force;
+// }
 
 void Box::applyXYVelocity(float xForce, float yForce){
     xvelocity = xForce;
     yvelocity = yForce;
 }
 
-void Box::renderTESTINGONLY(int posx, int posy){
-    rect = {posx, posy, BOX_WIDTH, BOX_HEIGHT};
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
-}
+// void Box::renderTESTINGONLY(int posx, int posy){
+//     rect = {posx, posy, BOX_WIDTH, BOX_HEIGHT};
+//     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+// }
 
 void Box::render(int xcam, int ycam){
     rect = {static_cast<int>(round(x)) - xcam, static_cast<int>(round(y) - ycam), BOX_WIDTH, BOX_HEIGHT};
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
 }
 
-void Box::render(){
-    rect = {static_cast<int>(round(x)), static_cast<int>(round(y)), BOX_WIDTH, BOX_HEIGHT};
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
-    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    // SDL_RenderDrawPoint(renderer, x, y);
-    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-}
+// void Box::render(){
+//     rect = {static_cast<int>(round(x)), static_cast<int>(round(y)), BOX_WIDTH, BOX_HEIGHT};
+//     SDL_RenderCopyEx(renderer, texture, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+// }
 
 int Box::getWidth(){
     return BOX_WIDTH;
@@ -70,6 +65,7 @@ float Box::getXVelocity(){
 }
 
 void Box::simulatePhysics(float dt, vector<Tile> &tiles){
+
     yvelocity += dt * GRAVITY;
 
     float xold = x;
@@ -78,9 +74,8 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
     y += yvelocity * dt;
     x += xvelocity * dt;
 
-    // If level is completed, just ignore collision and send player upwards.
+    // If level is completed, just ignore collision.
     if(completedLevel) {
-        lastPhysicsUpdate = SDL_GetTicks(); // need to update or else everything goes to shit
         return;
     }
 
@@ -92,7 +87,6 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
         if(tile->isColliding(this)){
 
             if(tile->finish){
-                //printf("Finish reached.");
                 yvelocity = -1500;
                 completedLevel = true;
             } else {
@@ -146,53 +140,11 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                     x = xold;
                     y = yold;
                 }
-
-
-
-
-
-
-
-
-
-                // if(xDistance < yDistance){
-                //     // fix x-axis of box only
-                //     if(xvelocity > 0){
-                //         x -= xDistance;
-                //     } else {
-                //         x += xDistance;
-                //     }
-                //     xvelocity = 0;
-                // } else if(xDistance > yDistance) {
-                //     // fix y-axis of box only
-                //     if(yvelocity > 0){
-                //         y -= yDistance;
-                //     } else {
-                //         y += yDistance;
-                //     }
-                //     yvelocity = 0;
-                //     if(xvelocity > 4){
-                //         xvelocity += dt * (-X_FRICTION);
-                //     } else if(xvelocity < -4){
-                //         xvelocity += dt * X_FRICTION;
-                //     } else {
-                //         xvelocity = 0;
-                //     }
-                // } else {
-                //     // prioritize x for literally no reason
-                //     if(xvelocity > 0){
-                //         x -= xDistance;
-                //     } else {
-                //         x += xDistance;
-                //     }
-                //     xvelocity = 0;
-                // }
             }
         }
     }
     
     tile = NULL;
-    lastPhysicsUpdate = SDL_GetTicks();
 }
 
 Box::~Box() {
