@@ -53,7 +53,7 @@ SDL_Texture* endTileTexture;
 TTF_Font* globalFont;
 TTF_Font* timerFont;
 
-const int NUMBER_OF_LEVELS = 1; // Change this when you add/remove levels.
+const int NUMBER_OF_LEVELS = 5; // Change this when you add/remove levels.
 int currentLevelIndex = 0;
 vector<string> levelNames;
 vector<Tile> *currentLevelTiles; // current level's tileset.
@@ -188,11 +188,11 @@ int init(){
     }
 
     // levelNames.push_back("00_21_10");
-    // levelNames.push_back("01_21_10");
-    // levelNames.push_back("02_21_19");
-    // levelNames.push_back("03_42_12");
-    // levelNames.push_back("04_15_35");
-    levelNames.push_back("05_50_31");
+    levelNames.push_back("01_21_10");
+    levelNames.push_back("02_21_19");
+    levelNames.push_back("03_42_12");
+    levelNames.push_back("04_33_25");
+    levelNames.push_back("05_15_35");
 
     return 0;
 }
