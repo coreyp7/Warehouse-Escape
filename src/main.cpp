@@ -1,25 +1,20 @@
 #include <SDL.h>
-#include <SDL_image.h> // for loading pngs
-#include <SDL_ttf.h> // for rendering text
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
-#include <string> // TODO: look into how this shit works at all
+#include <string>
 #include <sstream>
 #include <cmath>
 #include <vector>
 #include <fstream>
-
 using namespace std;
 
-// local object stuff
-#include "Box.h" // api for box object stuff
+// my objects
+#include "Box.h"
 #include "Text.h"
 #include "Tile.h"
 
 // Defining some global constants + other shit
-// const int WINDOW_WIDTH = 640;
-// const int WINDOW_HEIGHT = 480;
-// const int WINDOW_WIDTH = 720;
-// const int WINDOW_HEIGHT = 480;
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
 
@@ -32,8 +27,8 @@ const int END_TILE = 2;
 const int SPAWN_TILE = 3;
 
 const SDL_Color SDL_COLOR_BLACK = { 0, 0, 0, 255 }; // black
-const SDL_Color SDL_COLOR_GRAY = {255, 255, 255, 255};
-const SDL_Color SDL_COLOR_GREEN = {76, 187, 23, 255};
+const SDL_Color SDL_COLOR_WHITE = {255, 255, 255, 255};
+const SDL_Color SDL_COLOR_GREEN = {72, 255, 39, 255};
 
 // FPS Cap when rendering. 60 by default.
 short int fpsCap = 60;
@@ -49,7 +44,6 @@ int bgTextureWidth;
 SDL_Texture* boxTexture;
 SDL_Texture* tileTexture;
 SDL_Texture* endTileTexture;
-
 TTF_Font* globalFont;
 TTF_Font* timerFont;
 
@@ -59,10 +53,7 @@ vector<string> levelNames;
 vector<Tile> *currentLevelTiles; // current level's tileset.
 vector<Tile> levelTilesets[NUMBER_OF_LEVELS]; // array of every level's tileset.
 vector<pair<int, int>> levelSpawnPoints;
-
-
 int playerStartX, playerStartY;
-//int currentLevel = 0;
 
 int levelCompleted = false;
 Uint32 timeOfStartEntireGameRTA = 0; // for entire run of whole game
@@ -143,10 +134,10 @@ bool loadAssets(){
 }
 
 /* 
-    List of shit it does:
-    - SDL_Init (no vsync)
-    - create sdl window & renderer
-    - initialize IMG/font stuff and load the files (boxTexture/globalFont/etc)
+    List of stuff it does:
+    - SDL_Init (no vsync bc I do it manually)
+    - create sdl window, renderer, etc.
+    - calls loadAssets
 */
 int init(){
     if( SDL_Init(SDL_INIT_VIDEO) < 0 ){
@@ -154,7 +145,7 @@ int init(){
 		return -1;
     }
 
-    mainWindow = SDL_CreateWindow("Physics based off time", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN );
+    mainWindow = SDL_CreateWindow("Warehouse Escape", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN );
     if(mainWindow == NULL){
         printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
         return -2;
@@ -166,9 +157,6 @@ int init(){
 		printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
         return -3;
     }
-
-    // todo: set renderer draw color to black/default
-    //SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 
     // todo: initialize sdl_image
     int imgFlags = IMG_INIT_PNG;
@@ -197,6 +185,7 @@ int init(){
     return 0;
 }
 
+// Loads level from levels directory by filename (no file extension).
 vector<Tile> loadLevel(string filename){
     vector<Tile> tiles;
     int x = 0, y = 0; // tile offsets
@@ -204,7 +193,6 @@ vector<Tile> loadLevel(string filename){
     std::ifstream map("levels/"+filename+".level");
     int width = stoi(filename.substr(3, 2));
     int length = stoi(filename.substr(6, 2));
-    //printf("width:%i, length:%i", width, length);
 
     if(map.fail()){
         //printf("Unable to load map 1.");
@@ -235,7 +223,8 @@ vector<Tile> loadLevel(string filename){
 
             x += 75;
 
-            if(x/75 > (width-1)){ // TODO: get from filename
+            // move to next row if at end of current row (down)
+            if(x/75 > (width-1)){ 
                 x = 0;
                 y += 75;
             }
@@ -307,9 +296,9 @@ int main( int argc, char* args[] ){
     Text timerText = Text(renderer, timerFont, SDL_COLOR_GREEN);
     Text timerTextRTA = Text(renderer, timerFont, SDL_COLOR_GREEN);
 
-    Text levelBeatenText = Text(renderer, globalFont, SDL_COLOR_GRAY);
-    Text gameDoneText = Text(renderer, globalFont, SDL_COLOR_GRAY);
-    Text gameDoneText2 = Text(renderer, globalFont, SDL_COLOR_GRAY);
+    Text levelBeatenText = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    Text gameDoneText = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    Text gameDoneText2 = Text(renderer, globalFont, SDL_COLOR_WHITE);
 
     // Debug text
     Text avgFpsText = Text(renderer, globalFont, SDL_COLOR_BLACK);
@@ -344,8 +333,6 @@ int main( int argc, char* args[] ){
 
         // Go through event queue
         while( SDL_PollEvent( &e ) != 0 ){
-            
-            // // User requests quit
             switch (e.type){
                 case SDL_QUIT:
                     quit = true;
@@ -356,7 +343,7 @@ int main( int argc, char* args[] ){
                     }
                     break;
                 case SDL_MOUSEBUTTONDOWN:
-                    // If box is clicked, apply upward force to it.
+                    // If box is clicked, apply force to it.
                     int xmousepos = e.button.x;
                     int ymousepos = e.button.y;
 
@@ -368,8 +355,6 @@ int main( int argc, char* args[] ){
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
                         // apply vertical
-                        //printf("box.applyForceUp()");
-                        //box.applyForceUp();
                         int scaling = 20;
 
                         float yCenter = ybox + (box.getHeight()/2);
@@ -378,18 +363,13 @@ int main( int argc, char* args[] ){
                         if(ymousepos > yCenter){
                             // move up (negative)
                             yForce = -fabs(ymousepos - yCenter);
-                            //yForce = -20;
                         } else if(ymousepos < yCenter){
                             // move down (positive)
                             yForce = fabs(yCenter - ymousepos);
-                            //yForce = 20;
                         }
-                        //printf("yCenter:%f, ymousepos:%i, yForce:%f", yCenter, ymousepos, yForce);
-                        //printf("yforce:%d", yForce);
+
 
                         // apply horizontal
-                        
-                        // center (x only) of box
                         float center = xbox + (box.getWidth()/2);
 
                         // Figure out how much force to apply to xvelocity.
@@ -402,11 +382,9 @@ int main( int argc, char* args[] ){
                             // negative bc its going right
                             xForce = -(xmousepos - ((box.getWidth()/2) + xbox));
                         } else { 
-                            // exactly center (should never really happen)
-                            //TODO
+                            // exactly center (should never happen)
                         }
 
-                        //box.applyXVelocity(xForce*scaling);
                         box.applyXYVelocity(xForce*scaling, yForce*scaling);
                     }
                     
@@ -447,14 +425,13 @@ int main( int argc, char* args[] ){
                         timeOfStart = SDL_GetTicks();
                         timeOfFinish = -1;
                     } else {
-                        // TODO: show text that this is the end of the game
-                        // and thanks for playing.
+                        // Game completed, show text.
                         box.x = -500;
                         box.y = -500;
                         box.xvelocity = 0;
                         box.yvelocity = 0;
                         levelBeatenText.changeText("That's all the levels.");
-                        gameDoneText.changeText("Thank you, I appreciate you playing this.");
+                        gameDoneText.changeText("Thank you, I appreciate you playing this. ~Corey :)");
                         gameDoneText2.changeText("(you can press 'p' key to see debug info for fun)");
 
                         gameComplete = true;
@@ -494,11 +471,6 @@ int main( int argc, char* args[] ){
             avgFPS = 0;
         }
 
-        // Update avg fps text
-        avgFpsStr.str("");
-        avgFpsStr << "Avg FPS: " << avgFPS;
-        avgFpsText.changeText(avgFpsStr.str().c_str());
-
         ///////////////////////////
         // RENDERING STARTS HERE //
         ///////////////////////////
@@ -511,12 +483,12 @@ int main( int argc, char* args[] ){
             // is set to the camera's y position.
             offsetY = 0;
             newStartY = camera.y;
-            //printf("camera.y + (offset*2):%d, newStart:%d", camera.y + (offset*2), newStart);
         } else if(offsetY < -bgTextureHeight){
             offsetY = 0;
             newStartY = camera.y;
         }
 
+        // Do the same in the x-axis
         if(offsetX > bgTextureWidth){
             offsetX = 0;
             newStartX = camera.x;
@@ -557,16 +529,6 @@ int main( int argc, char* args[] ){
             bg4.y = bg1.y + bgTextureHeight;
         }
 
-        // if(offsetX >= 0){
-        //     bg2.x = bg1.x - bgTextureWidth;
-        // } else {
-        //     bg2.x = bg1.x + bgTextureWidth;
-        // }
-
-        //SDL_Rect bg3 = {bg1.x + bgTextureWidth, camera.w, camera.h };
-
-        //SDL_Rect bg = {, camera.y + (offsetY*2) - newStart, camera.w, camera.h };
-
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg1, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg2, 0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(renderer, bgTexture, NULL, &bg3, 0, NULL, SDL_FLIP_NONE);
@@ -578,19 +540,19 @@ int main( int argc, char* args[] ){
         // ACTUALLY: nevermind I figured out why this worked. I understood this in the moment
         // while troubleshooting but was astounded that a solution actually worked for once.
         // Nice job.
-        // TODO: initialize these variables outside while loop so you're not creating it everytime.
         
-
+        // Render level
         for(int i = 0; i<currentLevelTiles->size(); i++){
-            //currentLevelTiles[i]->render(camera.x, camera.y);
-            currentLevelTiles->at(i).render(camera.x, camera.y); // STUDY: look this up
+            currentLevelTiles->at(i).render(camera.x, camera.y);
         }
 
-        //box.render();
         box.render(camera.x, camera.y);
 
-        // show avg fps text & ms text
         if(debug){
+            // Update avg fps text
+            avgFpsStr.str("");
+            avgFpsStr << "Avg FPS: " << avgFPS;
+            avgFpsText.changeText(avgFpsStr.str().c_str());
             avgFpsText.render(0, 0);
             msText.changeText("ms render frame: "+std::to_string(SDL_GetTicks() - frameStart));
             msText.render(0, avgFpsText.getHeight());
@@ -613,16 +575,15 @@ int main( int argc, char* args[] ){
             offsetText.render(WINDOW_WIDTH - offsetText.getWidth(), boxText.getHeight() + cameraText.getHeight() + velocityText.getHeight());
         }
 
-        // Show timer
+        // Update the timers if its still appropriate to.
         if(!box.completedLevel){
             timerText.changeText(getTimeFormatted(timeOfStart));
         }
-        //timerText.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerText.getHeight() - timerTextRTA.getHeight());
 
         if(!completedRTA){
             timerTextRTA.changeText(getTimeFormatted(timeOfStartEntireGameRTA));
         }
-        //timerTextRTA.render(WINDOW_WIDTH - timerText.getWidth(), WINDOW_HEIGHT - timerTextRTA.getHeight());
+        
         timerTextRTA.render((WINDOW_WIDTH - timerText.getWidth())/2, 10);
         timerText.render((WINDOW_WIDTH - timerText.getWidth())/2, timerTextRTA.getHeight() + 10);
 
@@ -638,7 +599,7 @@ int main( int argc, char* args[] ){
 
 
         SDL_RenderPresent(renderer);
-        countedFrames++; // NOTE: not sure if this should be lower in loop
+        countedFrames++;
 
         // Finished rendering, cap framerate.
         // If frame is finished early, wait remaining time.
@@ -649,14 +610,13 @@ int main( int argc, char* args[] ){
 
     }
 
+    // Clean everything before closing application.
     avgFpsText.~Text();
     msText.~Text();
     boxText.~Text();
     cameraText.~Text();
     velocityText.~Text();
     offsetText.~Text();
-
-    //Free resources and close SDL
     close();
 
     return 0;
