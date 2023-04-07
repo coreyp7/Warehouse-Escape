@@ -78,8 +78,13 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
     y += yvelocity * dt;
     x += xvelocity * dt;
 
-    Tile* tile; // look into this, if its leaking memory
+    // If level is completed, just ignore collision and send player upwards.
+    if(completedLevel) {
+        lastPhysicsUpdate = SDL_GetTicks(); // need to update or else everything goes to shit
+        return;
+    }
 
+    Tile* tile; 
 
     for(int i=0; i<tiles.size(); i++){
         tile = &tiles[i];
@@ -92,9 +97,6 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                 completedLevel = true;
             } else {
                 
-                // 1. check if xold is valid, keep if it is
-                // 2. check if yold is valid, keep if it is
-                // 3. keep as old else
                 float xDistance, yDistance;
                 if(x < tile->x){
                     xDistance = ((x + BOX_WIDTH) - tile->x);
@@ -108,19 +110,19 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
                     yDistance = ((tile->y + tile->TILE_HEIGHT) - y);
                 }
 
+                // Check if this old x position isn't colliding with any of the
+                // tiles next to the current tile. Prevents player from getting
+                // stuck on ground while moving.
                 if(!tile->isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT) &&
                     ! tiles[i-1].isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT) &&
                     ! tiles[i+1].isColliding(xold, y, BOX_WIDTH, BOX_HEIGHT)){
-                    // keep xold, move on to next tile
-                    //x = xold;
-                    // fix x-axis of box only
                     if(xvelocity > 0){
                         x -= xDistance;
                     } else {
                         x += xDistance;
                     }
                     xvelocity = 0;
-                    printf("xold:%f, yold:%f, x:%f, y:%f\n", xold, yold, x, y);
+                    //printf("xold:%f, yold:%f, x:%f, y:%f\n", xold, yold, x, y);
                 } else if (!tile->isColliding(x, yold, BOX_WIDTH, BOX_HEIGHT)){
                     // keep yold, move on to next tile
                     //y = yold;
@@ -188,29 +190,7 @@ void Box::simulatePhysics(float dt, vector<Tile> &tiles){
             }
         }
     }
-
-    // Don't allow box to go outside x min/max bounds.
-    // if(x > X_MAX_LIMIT){
-    //     x = X_MAX_LIMIT;
-    // }
-    // else if(x < X_MIN_LIMIT){
-    //     x = X_MIN_LIMIT;
-    // }
-
-    // CHANGE: this should happen on collision detection not hardcoded
-    // if(y > 400.0){ // onground
-    //     y = 400.0;
-    //     yvelocity = 0;
-    //     if(xvelocity > 4){
-    //         xvelocity += dt * (-X_FRICTION);
-    //     } else if(xvelocity < -4){
-    //         xvelocity += dt * X_FRICTION;
-    //     } else {
-    //         xvelocity = 0;
-    //     }
-    //     //xvelocity = 0; // stop box on land
-    // }
-
+    
     tile = NULL;
     lastPhysicsUpdate = SDL_GetTicks();
 }

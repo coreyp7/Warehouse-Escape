@@ -434,16 +434,20 @@ int main( int argc, char* args[] ){
                     if(! (currentLevelIndex+1 >= NUMBER_OF_LEVELS)){
                         currentLevelIndex++; // go to next level
                         currentLevelTiles = &levelTilesets[currentLevelIndex];
-                        box.x = levelSpawnPoints[currentLevelIndex].first;
-                        box.y = levelSpawnPoints[currentLevelIndex].second;
                         box.xvelocity = 0;
                         box.yvelocity = 0;
+                        box.x = levelSpawnPoints[currentLevelIndex].first;
+                        box.y = levelSpawnPoints[currentLevelIndex].second;
                         box.completedLevel = false;
                         timeOfStart = SDL_GetTicks();
                         timeOfFinish = -1;
                     } else {
                         // TODO: show text that this is the end of the game
                         // and thanks for playing.
+                        box.x = -500;
+                        box.y = -500;
+                        box.xvelocity = 0;
+                        box.yvelocity = 0;
                         levelBeatenText.changeText("That's all the levels.");
                         gameDoneText.changeText("Thank you, I appreciate you playing this.");
                         gameDoneText2.changeText("(you can press 'p' key to see debug info for fun)");
@@ -621,7 +625,7 @@ int main( int argc, char* args[] ){
             levelBeatenText.render( (WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
             gameDoneText.render((WINDOW_WIDTH-gameDoneText.getWidth())/2, (WINDOW_HEIGHT+gameDoneText.getHeight()+levelBeatenText.getHeight())/2);
             gameDoneText2.render((WINDOW_WIDTH-gameDoneText2.getWidth())/2, 
-                (WINDOW_HEIGHT-gameDoneText2.getHeight()-50));
+                (WINDOW_HEIGHT-gameDoneText2.getHeight()-150));
         } else if(box.completedLevel){
             levelBeatenText.changeText("Escaped level "+to_string(currentLevelIndex+1));
             levelBeatenText.render((WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
