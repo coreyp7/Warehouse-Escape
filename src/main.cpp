@@ -47,6 +47,7 @@ SDL_Texture* tileTexture;
 SDL_Texture* endTileTexture;
 TTF_Font* globalFont;
 TTF_Font* timerFont;
+TTF_Font* coolvetica;
 
 const int NUMBER_OF_LEVELS = 5; // Change this when you add/remove levels.
 int currentLevelIndex = 0;
@@ -70,7 +71,9 @@ Mix_Music *music = NULL;
 Mix_Chunk *hit1 = NULL;
 Mix_Chunk *hit2 = NULL;
 Mix_Chunk *hit3 = NULL;
-Mix_Chunk* hitsounds[3];;
+Mix_Chunk* hitsounds[3];
+
+bool started = false;
 
 void close(){
     SDL_DestroyTexture( boxTexture );
@@ -138,13 +141,19 @@ bool loadAssets(){
     // load font into global font
     globalFont = TTF_OpenFont("img/primitive_sandbox/Lato-Black.ttf", 26);
     if(globalFont == NULL){
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		printf( "Failed to load lato black: %s\n", TTF_GetError() );
         return -7;
     }
 
     timerFont = TTF_OpenFont("img/primitive_sandbox/AdvancedPixel.ttf", 30);
     if(timerFont == NULL){
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		printf( "Failed to load timer font: %s\n", TTF_GetError() );
+        return -8;
+    }
+
+    coolvetica = TTF_OpenFont("img/primitive_sandbox/coolvetica.otf", 36);
+    if(coolvetica == NULL){
+		printf( "Failed to load coolvetica font: %s\n", TTF_GetError() );
         return -8;
     }
 
@@ -365,7 +374,7 @@ int main( int argc, char* args[] ){
     playerStartY = levelSpawnPoints[0].second;
 
     // Player object is called box for some reason
-    Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
+    // Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
 
     SDL_Rect camera = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
 
@@ -373,6 +382,9 @@ int main( int argc, char* args[] ){
     int offsetX = 0;
     int newStartY = 0; // indicates where scrolling should begin again for bg.
     int newStartX = 0;
+
+    Text startingText = Text(renderer, coolvetica, SDL_COLOR_BLACK);
+    startingText.changeText("Warehouse Escape press enter to start");
 
     hitsounds[0] = hit1;
     hitsounds[1] = hit2;
@@ -383,7 +395,37 @@ int main( int argc, char* args[] ){
     Mix_VolumeChunk(hit2, 3);
     Mix_VolumeChunk(hit3, 3);
 
-    // While game is running
+    // Show title screen
+    while(!started){
+        // Go through event queue
+        while( SDL_PollEvent( &e ) != 0 ){
+            switch (e.type){
+                case SDL_QUIT:
+                    quit = true;
+                    started = true;
+                    break;
+                case SDL_KEYDOWN:
+                    if(e.key.keysym.sym == SDLK_RETURN){
+                        started = true;
+                    }
+                    break;
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+        SDL_RenderClear(renderer);
+        startingText.render((WINDOW_WIDTH-startingText.getWidth())/2, (WINDOW_HEIGHT-startingText.getHeight())/2);
+        SDL_RenderPresent(renderer);
+    }
+    startingText.~Text();
+
+    Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
+    printf("Box created");
+    timeOfStartEntireGameRTA = SDL_GetTicks();
+    timeOfStart = SDL_GetTicks();
+    lastPhysicsUpdate = SDL_GetTicks();
+
+    // Start main game loop
     while(!quit){
         frameStart = SDL_GetTicks(); // mark time(in m/s) at start of this frame
 
@@ -411,7 +453,7 @@ int main( int argc, char* args[] ){
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
                         int numb = rand() % 3;
-                        Mix_PlayChannel(-1, hitsounds[numb], 0);
+                        // Mix_PlayChannel(-1, hitsounds[numb], 0);
                         //printf("Playing %i", numb);
 
                         // apply vertical
