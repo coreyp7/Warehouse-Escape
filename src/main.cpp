@@ -377,11 +377,11 @@ int main( int argc, char* args[] ){
     hitsounds[0] = hit1;
     hitsounds[1] = hit2;
     hitsounds[2] = hit3;
+    Mix_VolumeMusic(5);
     Mix_PlayMusic(music, -1);
-    Mix_VolumeMusic(MIX_MAX_VOLUME/3);
-    Mix_VolumeChunk(hit1, MIX_MAX_VOLUME/3);
-    Mix_VolumeChunk(hit2, MIX_MAX_VOLUME/3);
-    Mix_VolumeChunk(hit3, MIX_MAX_VOLUME/3);
+    Mix_VolumeChunk(hit1, 3);
+    Mix_VolumeChunk(hit2, 3);
+    Mix_VolumeChunk(hit3, 3);
 
     // While game is running
     while(!quit){
@@ -412,7 +412,7 @@ int main( int argc, char* args[] ){
                     {
                         int numb = rand() % 3;
                         Mix_PlayChannel(-1, hitsounds[numb], 0);
-                        printf("Playing %i", numb);
+                        //printf("Playing %i", numb);
 
                         // apply vertical
                         int scaling = 20;
