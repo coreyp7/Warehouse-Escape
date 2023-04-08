@@ -48,6 +48,7 @@ SDL_Texture* endTileTexture;
 TTF_Font* globalFont;
 TTF_Font* timerFont;
 TTF_Font* coolvetica;
+TTF_Font* retro;
 
 const int NUMBER_OF_LEVELS = 5; // Change this when you add/remove levels.
 int currentLevelIndex = 0;
@@ -151,9 +152,15 @@ bool loadAssets(){
         return -8;
     }
 
-    coolvetica = TTF_OpenFont("img/primitive_sandbox/coolvetica.otf", 36);
+    coolvetica = TTF_OpenFont("img/primitive_sandbox/coolvetica.otf", 46);
     if(coolvetica == NULL){
 		printf( "Failed to load coolvetica font: %s\n", TTF_GetError() );
+        return -8;
+    }
+
+    retro = TTF_OpenFont("img/primitive_sandbox/retro.ttf", 36);
+    if(retro == NULL){
+        printf( "Failed to load retro font: %s\n", TTF_GetError() );
         return -8;
     }
 
@@ -317,6 +324,44 @@ string getTimeFormatted(Uint32 time){
     return to_string(minutes)+":"+secondsStr+":"+msString;
 }
 
+bool mainMenuLoop(){
+    SDL_Event e; // Event handler
+
+    SDL_Rect menuBg = {0, 0, bgTextureWidth, bgTextureHeight};
+    Text startingText = Text(renderer, coolvetica, SDL_COLOR_WHITE);
+    startingText.changeText("Warehouse Escape");
+    Text startingText2 = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    startingText2.changeText("Press 'Enter' to start");
+
+    // Show title screen
+    while(!started){
+        // Go through event queue
+        while( SDL_PollEvent( &e ) != 0 ){
+            switch (e.type){
+                case SDL_QUIT:
+                    return true;
+                    break;
+                case SDL_KEYDOWN:
+                    if(e.key.keysym.sym == SDLK_RETURN){
+                        started = true;
+                    }
+                    break;
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+        SDL_RenderClear(renderer);
+        SDL_Rect bg1 = {0, 0, bgTextureWidth, bgTextureHeight};
+        SDL_RenderCopyEx(renderer, bgTexture, NULL, &menuBg, 0, NULL, SDL_FLIP_NONE);
+        startingText.render((WINDOW_WIDTH-startingText.getWidth())/2, ((WINDOW_HEIGHT-startingText.getHeight())/2)-35);
+        startingText2.render((WINDOW_WIDTH-startingText2.getWidth())/2, ((WINDOW_HEIGHT-startingText2.getHeight())/2)+35);
+        SDL_RenderPresent(renderer);
+    }
+    
+    startingText.~Text();
+    return false;
+}
+
 int main( int argc, char* args[] ){
 
     int initValue = init();
@@ -383,9 +428,6 @@ int main( int argc, char* args[] ){
     int newStartY = 0; // indicates where scrolling should begin again for bg.
     int newStartX = 0;
 
-    Text startingText = Text(renderer, coolvetica, SDL_COLOR_BLACK);
-    startingText.changeText("Warehouse Escape press enter to start");
-
     hitsounds[0] = hit1;
     hitsounds[1] = hit2;
     hitsounds[2] = hit3;
@@ -395,29 +437,10 @@ int main( int argc, char* args[] ){
     Mix_VolumeChunk(hit2, 3);
     Mix_VolumeChunk(hit3, 3);
 
-    // Show title screen
-    while(!started){
-        // Go through event queue
-        while( SDL_PollEvent( &e ) != 0 ){
-            switch (e.type){
-                case SDL_QUIT:
-                    quit = true;
-                    started = true;
-                    break;
-                case SDL_KEYDOWN:
-                    if(e.key.keysym.sym == SDLK_RETURN){
-                        started = true;
-                    }
-                    break;
-            }
-        }
-
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF );
-        SDL_RenderClear(renderer);
-        startingText.render((WINDOW_WIDTH-startingText.getWidth())/2, (WINDOW_HEIGHT-startingText.getHeight())/2);
-        SDL_RenderPresent(renderer);
+    bool exited = mainMenuLoop();
+    if(exited){
+        quit = true;
     }
-    startingText.~Text();
 
     Box box = Box(renderer, boxTexture, playerStartX, playerStartY);
     printf("Box created");
