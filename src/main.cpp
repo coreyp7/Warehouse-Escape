@@ -48,7 +48,6 @@ SDL_Texture* endTileTexture;
 TTF_Font* globalFont;
 TTF_Font* timerFont;
 TTF_Font* coolvetica;
-TTF_Font* retro;
 
 const int NUMBER_OF_LEVELS = 5; // Change this when you add/remove levels.
 int currentLevelIndex = 0;
@@ -58,7 +57,6 @@ vector<Tile> levelTilesets[NUMBER_OF_LEVELS]; // array of every level's tileset.
 vector<pair<int, int>> levelSpawnPoints;
 int playerStartX, playerStartY;
 
-//int levelCompleted = false;
 Uint32 timeOfStartEntireGameRTA = 0; // for entire run of whole game
 bool completedRTA = false;
 Uint32 timeOfStart = 0; // start of timer in level
@@ -84,9 +82,12 @@ void close(){
 
     TTF_CloseFont(globalFont);
     TTF_CloseFont(timerFont);
+    TTF_CloseFont(coolvetica);
     TTF_Quit();
 
     Mix_FreeChunk(hit1);
+    Mix_FreeChunk(hit2);
+    Mix_FreeChunk(hit3);
     Mix_FreeMusic(music);
     Mix_CloseAudio();
     Mix_Quit();
@@ -98,6 +99,8 @@ void close(){
     tileTexture = NULL;
     endTileTexture = NULL;
     bgTexture = NULL;
+
+    currentLevelTiles = NULL;
 
     globalFont = NULL;
     timerFont = NULL;
@@ -158,12 +161,6 @@ bool loadAssets(){
         return -8;
     }
 
-    retro = TTF_OpenFont("img/primitive_sandbox/retro.ttf", 36);
-    if(retro == NULL){
-        printf( "Failed to load retro font: %s\n", TTF_GetError() );
-        return -8;
-    }
-
     music = Mix_LoadMUS("img/primitive_sandbox/phoon.wav");
     if(music == NULL){
         printf("Failed to load music. %s\n", Mix_GetError());
@@ -196,6 +193,7 @@ bool loadAssets(){
     - SDL_Init (no vsync bc I do it manually)
     - create sdl window, renderer, etc.
     - calls loadAssets
+    - adds level names to 'levelNames' array
 */
 int init(){
     if( SDL_Init(SDL_INIT_VIDEO) < 0 ){
@@ -400,6 +398,13 @@ int main( int argc, char* args[] ){
     Text levelBeatenText = Text(renderer, globalFont, SDL_COLOR_WHITE);
     Text gameDoneText = Text(renderer, globalFont, SDL_COLOR_WHITE);
     Text gameDoneText2 = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    Text gameDoneText3 = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    Text gameDoneText4 = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    levelBeatenText.changeText("That's all the levels.");
+    gameDoneText.changeText("Thank you, I appreciate you playing this.");
+    gameDoneText4.changeText("~ Corey Pierce");
+    gameDoneText2.changeText("(you can press 'p' key to see debug info for fun)");
+    gameDoneText3.changeText("Press 'r' to start a new run.");
 
     // Debug text
     Text avgFpsText = Text(renderer, globalFont, SDL_COLOR_BLACK);
@@ -409,6 +414,7 @@ int main( int argc, char* args[] ){
     Text cameraText = Text(renderer, globalFont, SDL_COLOR_BLACK);
     Text velocityText = Text(renderer, globalFont, SDL_COLOR_BLACK);
     Text offsetText = Text(renderer, globalFont, SDL_COLOR_BLACK);
+    
 
     // Load all level files and put into vector.
     for(int i=0; i<levelNames.size(); i++){
@@ -464,8 +470,7 @@ int main( int argc, char* args[] ){
                     } else if (e.key.keysym.sym == SDLK_r)
                     {
                         // Restart run back to level 1.
-                        // Set current level in array
-                        // restart timers
+                        // Reset timers.
                         currentLevelIndex = 0;
                         currentLevelTiles = &levelTilesets[0];
                         playerStartX = levelSpawnPoints[0].first;
@@ -477,7 +482,9 @@ int main( int argc, char* args[] ){
                         box.y = playerStartY;
                         box.completedLevel = false;
                         gameComplete = false;
-                        
+                        completedRTA = false;
+                        timeOfFinish = -1;
+
                         timeOfStart = SDL_GetTicks();
                         timeOfStartEntireGameRTA = SDL_GetTicks();
                     }
@@ -575,9 +582,6 @@ int main( int argc, char* args[] ){
                         box.y = -500;
                         box.xvelocity = 0;
                         box.yvelocity = 0;
-                        levelBeatenText.changeText("That's all the levels.");
-                        gameDoneText.changeText("Thank you, I appreciate you playing this. ~Corey :)");
-                        gameDoneText2.changeText("(you can press 'p' key to see debug info for fun)");
 
                         gameComplete = true;
                     }
@@ -735,8 +739,9 @@ int main( int argc, char* args[] ){
         if(gameComplete){
             levelBeatenText.render( (WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
             gameDoneText.render((WINDOW_WIDTH-gameDoneText.getWidth())/2, (WINDOW_HEIGHT+gameDoneText.getHeight()+levelBeatenText.getHeight())/2);
-            gameDoneText2.render((WINDOW_WIDTH-gameDoneText2.getWidth())/2, 
-                (WINDOW_HEIGHT-gameDoneText2.getHeight()-150));
+            gameDoneText2.render((WINDOW_WIDTH-gameDoneText2.getWidth())/2, (WINDOW_HEIGHT-gameDoneText2.getHeight()-50));
+            gameDoneText3.render((WINDOW_WIDTH-gameDoneText3.getWidth())/2, (WINDOW_HEIGHT-gameDoneText3.getHeight())-100);
+            gameDoneText4.render((WINDOW_WIDTH-gameDoneText4.getWidth())/2, (WINDOW_HEIGHT-gameDoneText4.getHeight())-250);
         } else if(box.completedLevel){
             levelBeatenText.changeText("Escaped level "+to_string(currentLevelIndex+1));
             levelBeatenText.render((WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
