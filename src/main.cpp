@@ -58,7 +58,7 @@ vector<Tile> levelTilesets[NUMBER_OF_LEVELS]; // array of every level's tileset.
 vector<pair<int, int>> levelSpawnPoints;
 int playerStartX, playerStartY;
 
-int levelCompleted = false;
+//int levelCompleted = false;
 Uint32 timeOfStartEntireGameRTA = 0; // for entire run of whole game
 bool completedRTA = false;
 Uint32 timeOfStart = 0; // start of timer in level
@@ -136,7 +136,7 @@ bool loadAssets(){
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
     }
-    // store its height for scrolling purposes.
+    // store its width/height for scrolling purposes.
     SDL_QueryTexture(bgTexture, NULL, NULL, &bgTextureWidth, &bgTextureHeight);
 
     // load font into global font
@@ -461,7 +461,27 @@ int main( int argc, char* args[] ){
                 case SDL_KEYDOWN:
                     if(e.key.keysym.sym == SDLK_p){
                         debug = !debug;
+                    } else if (e.key.keysym.sym == SDLK_r)
+                    {
+                        // Restart run back to level 1.
+                        // Set current level in array
+                        // restart timers
+                        currentLevelIndex = 0;
+                        currentLevelTiles = &levelTilesets[0];
+                        playerStartX = levelSpawnPoints[0].first;
+                        playerStartY = levelSpawnPoints[0].second;
+
+                        box.xvelocity = 0;
+                        box.yvelocity = 0;
+                        box.x = playerStartX;
+                        box.y = playerStartY;
+                        box.completedLevel = false;
+                        gameComplete = false;
+                        
+                        timeOfStart = SDL_GetTicks();
+                        timeOfStartEntireGameRTA = SDL_GetTicks();
                     }
+                    
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     // If box is clicked, apply force to it.
