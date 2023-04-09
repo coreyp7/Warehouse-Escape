@@ -117,25 +117,25 @@ void close(){
 bool loadAssets(){
     bool success = true;
 
-    boxTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/box_final5.png");
+    boxTexture = IMG_LoadTexture(renderer, "assets/img/box_final5.png");
     if(boxTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
         success = false;
     }
 
-    tileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/tile_final.png");
+    tileTexture = IMG_LoadTexture(renderer, "assets/img/tile_final.png");
     if(tileTexture == NULL){
         printf("Couldn't load tile texture. %s", IMG_GetError());
         success = false;
     }
 
-    endTileTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/end2.png");
+    endTileTexture = IMG_LoadTexture(renderer, "assets/img/end2.png");
     if(tileTexture == NULL){
         printf("Couldn't load tile texture. %s", IMG_GetError());
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "img/primitive_sandbox/warehouse.png");
+    bgTexture = IMG_LoadTexture(renderer, "assets/img/warehouse.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
     }
@@ -143,43 +143,43 @@ bool loadAssets(){
     SDL_QueryTexture(bgTexture, NULL, NULL, &bgTextureWidth, &bgTextureHeight);
 
     // load font into global font
-    globalFont = TTF_OpenFont("img/primitive_sandbox/Lato-Black.ttf", 26);
+    globalFont = TTF_OpenFont("assets/fonts/Lato-Black.ttf", 26);
     if(globalFont == NULL){
 		printf( "Failed to load lato black: %s\n", TTF_GetError() );
         return -7;
     }
 
-    timerFont = TTF_OpenFont("img/primitive_sandbox/AdvancedPixel.ttf", 30);
+    timerFont = TTF_OpenFont("assets/fonts/AdvancedPixel.ttf", 30);
     if(timerFont == NULL){
 		printf( "Failed to load timer font: %s\n", TTF_GetError() );
         return -8;
     }
 
-    coolvetica = TTF_OpenFont("img/primitive_sandbox/coolvetica.otf", 46);
+    coolvetica = TTF_OpenFont("assets/fonts/coolvetica.otf", 46);
     if(coolvetica == NULL){
 		printf( "Failed to load coolvetica font: %s\n", TTF_GetError() );
         return -8;
     }
 
-    music = Mix_LoadMUS("img/primitive_sandbox/phoon.wav");
+    music = Mix_LoadMUS("assets/sounds/phoon.wav");
     if(music == NULL){
         printf("Failed to load music. %s\n", Mix_GetError());
         return -9;
     }
 
-    hit1 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit1.wav");
+    hit1 = Mix_LoadWAV("assets/sounds/hit1.wav");
     if(hit1 == NULL){
         printf("Failed to load hit1. %s\n", Mix_GetError());
         return -10;
     }
 
-    hit2 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit2.wav");
+    hit2 = Mix_LoadWAV("assets/sounds/hit2.wav");
     if(hit1 == NULL){
         printf("Failed to load hit2. %s\n", Mix_GetError());
         return -10;
     }
 
-    hit3 = Mix_LoadWAV("img/primitive_sandbox/sounds/hit3.wav");
+    hit3 = Mix_LoadWAV("assets/sounds/hit3.wav");
     if(hit1 == NULL){
         printf("Failed to load hit3. %s\n", Mix_GetError());
         return -10;
