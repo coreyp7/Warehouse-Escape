@@ -7,7 +7,7 @@ OBJS = src\$(FILENAME).cpp src\Text.cpp src\Box.cpp src\Tile.cpp
 CC = g++
 
 #INCLUDE_PATHS specifies the additional include paths we'll need
-INCLUDE_PATHS = -IC:\MinGW\include\SDL2
+INCLUDE_PATHS = -IC:\MinGW\include\SDL2 -Iinclude/
 #INCLUDE_PATHS = -I include -IC:\MinGW\include\SDL2
 
 #LIBRARY_PATHS specifies the additional library paths we'll need

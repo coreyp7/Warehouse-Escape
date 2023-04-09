@@ -3,7 +3,7 @@
 *.dll
 
 lib/
-include/
+exe/
 .vscode/
 
 # all the training shit
