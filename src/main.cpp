@@ -20,7 +20,7 @@ const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
 
 //const int CAMERA_PADDING = 75;
-const int CAMERA_PADDING = 125;
+const int CAMERA_PADDING = 275;
 
 const int EMPTY_TILE = 0;
 const int GROUND_TILE = 1;
@@ -135,7 +135,7 @@ bool loadAssets(){
         success = false;
     }
 
-    bgTexture = IMG_LoadTexture(renderer, "assets/img/warehouse.png");
+    bgTexture = IMG_LoadTexture(renderer, "assets/img/warehouse_big.png");
     if(bgTexture == NULL){
         printf("Couldn't load box texture. %s", IMG_GetError());
     }
@@ -395,7 +395,7 @@ int main( int argc, char* args[] ){
     Text timerText = Text(renderer, timerFont, SDL_COLOR_GREEN);
     Text timerTextRTA = Text(renderer, timerFont, SDL_COLOR_GREEN);
 
-    Text levelBeatenText = Text(renderer, globalFont, SDL_COLOR_WHITE);
+    Text levelBeatenText = Text(renderer, coolvetica, SDL_COLOR_WHITE);
     Text gameDoneText = Text(renderer, globalFont, SDL_COLOR_WHITE);
     Text gameDoneText2 = Text(renderer, globalFont, SDL_COLOR_WHITE);
     Text gameDoneText3 = Text(renderer, globalFont, SDL_COLOR_WHITE);
@@ -503,7 +503,7 @@ int main( int argc, char* args[] ){
                     ymousepos > ybox && ymousepos < ybox+box.getHeight())
                     {
                         int numb = rand() % 3;
-                        // Mix_PlayChannel(-1, hitsounds[numb], 0);
+                        Mix_PlayChannel(-1, hitsounds[numb], 0);
                         //printf("Playing %i", numb);
 
                         // apply vertical
@@ -737,14 +737,14 @@ int main( int argc, char* args[] ){
         timerText.render((WINDOW_WIDTH - timerText.getWidth())/2, timerTextRTA.getHeight() + 10);
 
         if(gameComplete){
-            levelBeatenText.render( (WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
+            levelBeatenText.render((WINDOW_WIDTH-levelBeatenText.getWidth())/2, ((WINDOW_HEIGHT-levelBeatenText.getHeight())/2) - 200);
             gameDoneText.render((WINDOW_WIDTH-gameDoneText.getWidth())/2, (WINDOW_HEIGHT+gameDoneText.getHeight()+levelBeatenText.getHeight())/2);
             gameDoneText2.render((WINDOW_WIDTH-gameDoneText2.getWidth())/2, (WINDOW_HEIGHT-gameDoneText2.getHeight()-50));
             gameDoneText3.render((WINDOW_WIDTH-gameDoneText3.getWidth())/2, (WINDOW_HEIGHT-gameDoneText3.getHeight())-100);
             gameDoneText4.render((WINDOW_WIDTH-gameDoneText4.getWidth())/2, (WINDOW_HEIGHT-gameDoneText4.getHeight())-250);
         } else if(box.completedLevel){
             levelBeatenText.changeText("Escaped level "+to_string(currentLevelIndex+1));
-            levelBeatenText.render((WINDOW_WIDTH-levelBeatenText.getWidth())/2, (WINDOW_HEIGHT-levelBeatenText.getHeight())/2);
+            levelBeatenText.render((WINDOW_WIDTH-levelBeatenText.getWidth())/2, ((WINDOW_HEIGHT-levelBeatenText.getHeight())/2) - 200);
         }
 
 
