@@ -24,3 +24,6 @@ There's two timers at the top of the window that will keep track of two things:
  - The IL time for the *current level only*
 
 These will make it a lot easier for you to see how much better you get at getting the box to where you want it to go.
+
+![preview 1](./promo/preview1.png)
+![preview 2](./promo/preview2.png)
