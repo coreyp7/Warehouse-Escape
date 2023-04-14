@@ -25,5 +25,4 @@ There's two timers at the top of the window that will keep track of two things:
 
 These will make it a lot easier for you to see how much better you get at getting the box to where you want it to go.
 
-![preview 1](./promo/preview1.png)
-![preview 2](./promo/preview2.png)
+![preview 3](./promo/preview3.gif)
