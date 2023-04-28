@@ -4,6 +4,8 @@
 
 It's written in C++ with [SDL](https://www.libsdl.org/) (including [SDL_image](https://github.com/libsdl-org/SDL_image), [SDL_mixer](https://github.com/libsdl-org/SDL_mixer), and [SDL_ttf](https://github.com/libsdl-org/SDL_ttf)).
 
+### [YouTube video of gameplay footage](https://youtu.be/NnFjYvj1s3Q)
+
 ## Platforms
 The current release is for Windows only. The zip includes an executable with all of the required .dll files inside. Just keep the executable in the directory and run it.
 *If you wanted to try it out on another OS, you'll have to clone the repo and compile it on your own (for now). *
