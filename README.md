@@ -6,6 +6,8 @@ It's written in C++ with [SDL](https://www.libsdl.org/) (including [SDL_image](h
 
 ### [YouTube video of gameplay footage](https://youtu.be/NnFjYvj1s3Q)
 
+![preview 3](./promo/preview3small.gif)
+
 ## Platforms
 The current release is for Windows only. The zip includes an executable with all of the required .dll files inside. Just keep the executable in the directory and run it.
 *If you wanted to try it out on another OS, you'll have to clone the repo and compile it on your own (for now). *
@@ -26,5 +28,3 @@ There's two timers at the top of the window that will keep track of two things:
  - The IL time for the *current level only*
 
 These will make it a lot easier for you to see how much better you get at getting the box to where you want it to go.
-
-![preview 3](./promo/preview3small.gif)
